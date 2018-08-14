@@ -254,24 +254,169 @@ p\mathrm{\ is\ a\ shortest\ past\ from\ u\ to\ v} \iff
 $$
 
 
-### Lemma
+### Lemma (最短路徑性質)
 
 $G = (V, E)$ 是個圖（有向或無向），則：
+
 
 
 $$
 \forall s \in V.\forall (u, v) \in E.\delta(s, v) \leq \delta(s, u) + 1
 $$
 
-1. 假定 $s, u\mathrm{\ not\ reachable}$，則 $\delta(s, u) = \infty$，命題成立。
+1. 假定 $s\ u\mathrm{\ not\ reachable}$，則 $\delta(s, u) = \infty$，命題成立。
 
-2. 假定 $s, u\mathrm{\ reachable}$，則存在一條長度 $\delta(s, u)$ 的最短路徑 $p' = \langle s...u \rangle$，則路徑 $p = p' \cup \{v\}$ 是一條 $u, v$ 間的路徑（未必是最短），長度為 $\delta(s, u) + 1$。因為任何路徑長度都 $\leq$ 最短路徑長度，故：
+2. 假定 $s\ u\mathrm{\ reachable}$，則存在一條長度 $\delta(s, u)$ 的最短路徑 $p' = \langle s...u \rangle$，則路徑 $p = p' \cup \{v\}$ 是一條 $u, v$ 間的路徑（未必是最短），長度為 $\delta(s, u) + 1$。因為任何路徑長度都 $\leq$ 最短路徑長度，故：
+
+  
+
+  $$
+  \delta(s, v) \leq \delta(s, u) + 1
+  $$
+
+
+
+
+### Observation (每個點至多被 ENQUEUE 一次)
+
+由程式知：任意節點在 `ENQUEUE` 必定伴隨「由 `WHITE` 標為 `GRAY」` 的動作。如果 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟。但沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
+
+
+
+### Lemma (d 值不短於最短路徑)
+
+當 BFS 在 $G = (V, E) $ 從 $s \in V$ 開始並執行完畢之後：
+
+
+$$
+\forall v \in V. \ v.d \geq \delta(s, v)
+$$
+
+1. 第一次 `ENQUEUE` 時，起始點 $s$ 被塞進 `Q` 裡，並且進行 $s.d = 0 = \delta(s, s)$。而因為此時 $s$ 已經被標為 `GRAY`，故進入迴圈之後，$d$ 值不可能再被更新。而這時：
 
 	
 	$$
-	\delta(s, v) \leq \delta(s, u) + 1
+	\forall v \in V\setminus\{s\}．v.d = \infty \geq \delta(s, v)
 	$$
 	
+
+2. 假定在執行過程時，對於任意在 $u$ 被 `DEQUEUE` 至 $u$ 被標為 `BLACK` 前被發現的 `WHITE` 點 $v$ ，由歸納法假設：
+
+	
+	$$
+	u.d \geq \delta(s, u)
+	$$
+	
+
+	而下一步將會將 $v.d$ 指定為 $u.d + 1$，但：
+
+	
+	$$
+	\begin{align}
+	v.d &= u.d + 1\newline\newline
+	&\geq \delta(s, u) + 1 & (上式) \newline\newline
+	&\geq \delta(s, v) & (上一個 \mathrm{\ Lemma})
+	\end{align}
+	$$
+	由歸納法知原題成立。
+
+
+
+> 白話文： d 值有限表示兩者有路徑長為 d 的路徑。又因為任意路徑長比最短路徑長，所以性質聽起來很合理。 而如果兩點不 reachable，d 值無限，因此性質顯然成立。
+
+### Lemma (Q 中 d 遞增，但只有兩種可能值)
+
+在對 $G = (V, E)$ 進行 BFS 的過程中的某個時候，假定 $Q$ 當中的元素依序為：
+
+
+$$
+Q = \langle v_1, v_2,...v_f \rangle
+$$
+其中 $v_1$ 是 Queue 最前面的元素、$v_f$ 是最後一個元素，則：
+
+
+$$
+\begin{cases}
+v_f.d \leq v_1 + 1 ,\ and\newline\newline
+v_i.d \leq v_{i + 1}.d & \forall i = 1, 2,..,f - 1
+\end{cases}
+$$
+證明的思路：所有東西的元素中， $d$ 的上限都是 $v_{1}.d + 1$，但又知道 $v_2.d \geq v_1.d$ ，可以很容易用歸納法證明。
+
+對每一次 `ENQUEUE` 使用歸納法：
+
+* 第 1 次 `ENQUEUE` 時，只有起始點 $s$ 一個元素，顯然成立。
+
+* 在進行某次 `ENQUEUE` 前，假定此時 `Q` 中的元素為：
+
+	
+	$$
+	Q = \langle v_1 ... v_f \rangle
+	$$
+	且滿足原性質：
+
+	
+	$$
+	\begin{cases}
+	v_f.d \leq   v_1.d + 1 & (1)\newline\newline
+	\forall i\in \{1,.,f-1\}.v_i.d \leq v_{i + 1}.d \Rightarrow v_1.d \leq v_2.d & (2)\newline
+	\end{cases}
+	$$
+	並且接下來要把 $v_{1}$ 從 `Q` `DEQUEUE`。令 $v_{f + 1}$ 是一個在 $v_0$ 被標記為 `BLACK` 前新發現的節點（如果這樣的節點不存在，性質 (2) 顯然成立; 又因為 $v_2.d + 1 \geq v_1.d + 1$，故性質 (1) 也會成立）由 BFS 步驟知：
+
+	
+	$$
+	v_{f + 1} = v_1.d + 1
+	$$
+	由 (2) 可以得到：
+
+	
+	$$
+	v_1.d \leq v_2.d \Rightarrow v_{f + 1}.d = v_1.d + 1 \leq v_2.d + 1
+	$$
+	故：
+
+	
+	$$
+	v_{f + 1}.d \leq v_2.d + 1
+	$$
+	因此性質 2. 成立。
+
+	
+
+	又因為： 
+	$$
+	v_{f}.d \leq v_1.d + 1 = v_{f + 1}.d
+	$$
+	加上由歸納法假設已知：
+
+	
+	$$
+	v_1.d \leq v_2.d \leq...\leq v_f.d
+	$$
+	因此：
+
+	
+	$$
+	v_2.d \leq...\leq v_f.d \leq v_{f + 1}.d
+	$$
+	
+
+	故知對於 `DEQUEUE` 之後第一個新找到的節點，在 `ENQUEUE` 之後仍然能使 `Q` 中的元素保持原命題。
+
+	而其他在 $v_1$ 被標為 `BLACK` 之前發現的點，$d$ 之大小都跟 $v_{f + 1}.d$ 相同，顯然加入 `Q` 之後，`Q` 也可以保持原性質。由此得證。 
+
+
+
+### Corollary
+
+假定 BFS 過程中，$v_i$ 比 $v_j$ 先被 `ENQUEUE`，則：
+
+
+$$
+v_i.d \leq v_j.d
+$$
+因為每一個點只會被 `ENQUEUE` 一次
 
 # Online Judge 
 
