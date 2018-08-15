@@ -229,8 +229,7 @@ void bfs(int start)
 
 ### Definition (Shortest-Path Distance)
 
-$G = (V, E)$ 是個圖，$Shortest-Path Distance 定義為：
-
+$G = (V, E)$ 是個圖，Shortest-Path Distance 定義為：
 
 $$
 \begin{align}
@@ -248,8 +247,8 @@ $$
 
 $$
 p\mathrm{\ is\ a\ shortest\ past\ from\ u\ to\ v} \iff 
-\begin{cases}p\mathrm{\ is\ a\ path\ from\ u\ to\ v},\ and\newline\newline
-\delta(\mathrm{u, v}) = |p| - 1
+\begin{cases}u \overset{p}{\leadsto}v,\ and\newline\newline
+ |p| - 1 = \delta(\mathrm{u, v})
 \end{cases}
 $$
 
@@ -270,23 +269,24 @@ $$
 
   
 
-  $$
+$$
   \delta(s, v) \leq \delta(s, u) + 1
-  $$
+$$
 
 
 
 
 ### Observation (每個點至多被 ENQUEUE 一次)
 
-由程式知：任意節點在 `ENQUEUE` 必定伴隨「由 `WHITE` 標為 `GRAY」` 的動作。如果 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟。但沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
+由程式知：只有 `WHITE` 點會被 `ENQUEUE`，且 `ENQUEUE` 的前一刻會立刻被標記為 `GRAY`。如果有一個點被 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟，使它再度變為 `WHITE`。但程式中沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
 
 
 
 ### Lemma (d 值不短於最短路徑)
 
-當 BFS 在 $G = (V, E) $ 從 $s \in V$ 開始並執行完畢之後：
 
+
+當 BFS 在 $G = (V, E) $ 從 $s \in V$ 開始並執行完畢之後：
 
 $$
 \forall v \in V. \ v.d \geq \delta(s, v)
@@ -294,11 +294,10 @@ $$
 
 1. 第一次 `ENQUEUE` 時，起始點 $s$ 被塞進 `Q` 裡，並且進行 $s.d = 0 = \delta(s, s)$。而因為此時 $s$ 已經被標為 `GRAY`，故進入迴圈之後，$d$ 值不可能再被更新。而這時：
 
-	
-	$$
-	\forall v \in V\setminus\{s\}．v.d = \infty \geq \delta(s, v)
-	$$
-	
+
+  $$
+  \forall v \in V\setminus\{s\}．v.d = \infty \geq \delta(s, v)
+  $$
 
 2. 假定在執行過程時，對於任意在 $u$ 被 `DEQUEUE` 至 $u$ 被標為 `BLACK` 前被發現的 `WHITE` 點 $v$ ，由歸納法假設：
 
@@ -322,12 +321,15 @@ $$
 
 
 
-> 白話文： d 值有限表示兩者有路徑長為 d 的路徑。又因為任意路徑長比最短路徑長，所以性質聽起來很合理。 而如果兩點不 reachable，d 值無限，因此性質顯然成立。
+> 白話文： d 值有限表示兩者有路徑長為 d 的路徑。又因為「任意路徑比最短路徑長」，所以這個性質聽起來很合理。 而如果兩點不 reachable，d 值無限，此性質顯然成立。
+
+
 
 ### Lemma (Q 中 d 遞增，但只有兩種可能值)
 
-在對 $G = (V, E)$ 進行 BFS 的過程中的某個時候，假定 $Q$ 當中的元素依序為：
 
+
+在對 $G = (V, E)$ 進行 BFS 的過程中的某個時候，假定 $Q$ 當中的元素依序為：
 
 $$
 Q = \langle v_1, v_2,...v_f \rangle
@@ -413,10 +415,38 @@ $$
 假定 BFS 過程中，$v_i$ 比 $v_j$ 先被 `ENQUEUE`，則：
 
 
+
 $$
 v_i.d \leq v_j.d
 $$
-因為每一個點只會被 `ENQUEUE` 一次
+因為每一個點只會被 `ENQUEUE` 一次，而且。
+
+
+
+### Thm (Correctness of BFS)
+
+$G = (V, E)$ 是一張圖，假定從某一點 $s$ 開始進行 BFS，則：
+
+1. (所有 reachable 的點都可以被發現，而且 d 值就是最短路徑長)
+
+	
+	$$
+	\begin{align}\forall u \in &V, s \overset{}{\leadsto}u.\newline\ & v.color=\mathrm{BLACK},\newline & v.d = \delta(s, v)\end{align}
+	$$
+
+2. (最短路徑)
+
+	
+	$$
+	\begin{align}
+	\forall v \in V  &,s \overset{}{\leadsto}u,\ v \neq s. \newline
+	 \exists p'\in &\{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ u.\pi \}.\newline
+	& p' +\!\!\!\!+  v \in \{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ v. \}
+	\end{align}
+	$$
+	
+
+	
 
 # Online Judge 
 

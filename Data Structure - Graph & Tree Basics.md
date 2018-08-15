@@ -44,9 +44,9 @@
 
        
 
-       $$
+     $$
        d_{u, i} = |\{(i, u)| (i, u) \in E\}|
-       $$
+     $$
 
        
 
@@ -54,18 +54,20 @@
 
        
 
-       $$
+     $$
             	d_{u, o} = |\{(u, i)| (u, i) \in E\}|
-       $$
+     $$
 
        
 
      3. Degree of u：$u$ 的 in-degree 加 out-degree。
 
-       
-       $$
-       \deg(u) = d_{u, i} + d_{u, o}
-       $$
+     	
+     	$$
+     	\deg(u) = d_{u, i} + d_{u, o}
+     	$$
+     	
+
 
 
 
@@ -77,9 +79,9 @@
 
       
 
-      $$
+    $$
       \deg(u) = |\{(u, i) | (u, i) \in E\}|
-      $$
+    $$
       ​     
 
 3. (Hand-Shaking Lemma)
@@ -121,23 +123,23 @@ $$
   \forall i \in \{0 ... k-1\}.(v_i, v_{i + 1}) \in E
   \end{cases}
 $$
-  
+
 
 ​	因為上面這個東西定義要塞進邏輯裡面實在是太長了，所以用：
 
 
 
 $$
-  p\ \mathrm{is\ a\ path\ from\ \__1 to\ \__{2}}
+u  \overset{p}{ \leadsto } v
 $$
 
   
 
-​	來說明 $p$ 是一個滿足上述性質的序列。
+​	來說明 $p$ 是一個從 $u$ 到 $v$ 的 path
 
   
 
-2. (Simple) 若 $p\ \mathrm{is\ a\ path\ from\ u\ to\ u'}$，且 $p$ 的長度為 $k$。若：
+2. (Simple) 若 $u \overset{p}{\leadsto} u'$，且 $p$ 的長度為 $k$。若 $p$ 中沒有重複經過的點，即：
 
 	
 
@@ -150,17 +152,18 @@ $$
 
 ​	則稱 p 為「simple」 path。因為把 path 的定義跟 simple 的定義全部塞進邏輯裡面實在是太長了，所以就用：
 
+
 $$
-  p\ \mathrm{is\ a\ simple\ path}
+u \overset{p}{\leadsto} u,\ p\ \mathrm{is\ simple}
 $$
 
-  	
+​	
 
-​	表示 $p$ 是一個滿足 simple 和 path 性質的序列。
+​	表示 $p$ 是一個滿足 simple  path 。
 
   
 
-3. (Cycle) 若 $p\ \mathrm{is\ a\ path\ from\ u\ to\ u'}$，且：
+3. (Cycle) 若 $u \overset{p}{\leadsto} u'$，且：
 
 
 $$
@@ -179,19 +182,14 @@ $$
 
   
 
-4. (Reachable) 若 $(u, v)$ 之間存在 path, $p$, 則稱「$v$ is reachable from $u$ via $p$」。即：
+4. (Reachable) 若 $u, v$ 間存在 path，即：
 
 
 $$
-\begin{align}
-  \exists k &\in \N \cup \{0\}.\exists \langle v_0 ... v_k\rangle.\newline
-  & v_0 = \__{1},\newline
-  &v_k = \__{2}, \newline
-  & \forall i\in\{n |0\leq n \leq k\}.v_i \in V
-  \end{align}
+\exists p.u \overset{p}{\leadsto}v
 $$
 
-  	因為在 formal logic 中把 Reachable 的定義全部填上去實在太麻煩，所以用：
+  	則稱「$v$ is reachable from $u$ via $p$」。因為在 formal logic 中把 Reachable 的定義全部填上去實在太麻煩，所以用：
 
   
 
@@ -218,9 +216,9 @@ $$
 
 
 $$
-  \forall \mathrm{u, u'} \in V.\exist p.p\  \mathrm {is\ a\ path\ from\ u\ to\ u'}
+\forall {u, u'} \in V.u \overset{}{\leadsto}u'
 $$
-  	
+
 
 ​	則稱圖是 Connected. 用：
 
@@ -247,7 +245,7 @@ $$
 
 
 $$
-  \exists p.p\mathrm{\ is\ a\ path}\ and\ p\ \mathrm{is\ a\ cycle}
+\exists p.p\ \mathrm{is\ a\ cycle}
 $$
 
 
@@ -255,7 +253,7 @@ $$
 
 
 $$
-  \neg(\exists p.p\mathrm{\ is\ a\ path}\ and\ p\ \mathrm{is\ a\ cycle})
+\neg(\exists p.p\ \mathrm{is\ a\ cycle})
 $$
  	則稱 $G$ 是 acyclic. 分別用：
 
@@ -278,32 +276,23 @@ $$
 
 1. $|V| = 2$: 只有兩個點。顯然成立。
 
-	
-
 2. 假定 $|V| = |V'| - 1$ 時命題成立，則對於任意 $u, v \in V$：
 
-  1. $u, v \in V'$：由歸納法假設可知命題成立。
+     1. $u, v \in V'$：由歸納法假設可知命題成立。
 
-  2. $u \in V', v\not \in V'$，且 $u, v$ 存在 path，且僅有最後一個點為 $v$：
+     2. $u \in V', v\not \in V'$，且 $u, v$ 存在 path，且僅有最後一個點為 $v$。令該 path 為：
 
-    令該 path 為：
-    $$
-    p = \langle u, u_1 ... u_{k-1}, v \rangle
-    $$
+     
+     $$
+       p = \langle u, u_1 ... u_{k-1}, v \rangle
+     $$
 
-    * 因 $v\neq u, u_1 ... u_{k-1}$  故 $u, u_1...u_{k-1}\in V'$。
+       由歸納法假設知 $u, u_{k-1}$ 間存在 simple path, $p'$。又 $v \not \in V'$，故 $v \not \in p'$，因此可知 $p$ 為一 simple path。
 
-    * 由歸納法假設知 $u, u_{k-1}$ 間存在 simple path, $p'$。
-
-    * 又 $v \not \in V'$，故 $v \not \in p'$，因此可知 $p$ 為一 simple path。
-
-    	
-
-  3. $u \in V', v\not \in V'$，且 $u, v$ 存在 path，且 $v$ 不只最後一個點為 $v$：
-
-    * 假定 $v$ 第一次出現在 $u_k$
-    * 取 $p' = \langle u, ...u_{k}\rangle$
-    * 由於 $p'$ 中 $v$ 僅在最後出現，故套用 2. 可知 $u, u_k = v$ 之間存在 simple path。
+     3. $u \in V', v\not \in V'$，且 $u, v$ 存在 path，且 $v$ 不只最後一個點為 $v$：
+       * 假定 $v$ 第一次出現在 $u_k$
+       * 取 $p' = \langle u, ...u_{k}\rangle$
+       * 由於 $p'$ 中 $v$ 僅在最後出現，故套用 2. 可知 $u, u_k = v$ 之間存在 simple path。
 
 ### Thm：Undirected, Connected ⇒ |E|  ≥ |V| - 1
 
@@ -313,11 +302,11 @@ $$
 
 2. 假定 $|V| = |V'| + 1$，隨便挑出一個點 $v \in V$，並令剩下的子圖 $G' = (V', E')$ 。$V = V' \cup \{v\}$, $v \not \in V'$, $E' \subset E$：
 
-  已知：$|E'| \geq |V'| - 1$
+	  已知：$|E'| \geq |V'| - 1$
 
-  且：$|V| = |V'| + 1$
+	  且：$|V| = |V'| + 1$
 
-  若原圖 $G = (V, E) = ( V' \cup \{v\}, E)$ 連通，則 $\exists u \in V'.(u, v) =: e \in E$，否則 $v$ 不連通。而 $v \not \in V'$，故 $e \not \in E'$，因此：
+	  若原圖 $G = (V, E) = ( V' \cup \{v\}, E)$ 連通，則 $\exists u \in V'.(u, v) =: e \in E$，否則 $v$ 不連通。而 $v \not \in V'$，故 $e \not \in E'$，因此：
 
 
 $$
@@ -352,42 +341,34 @@ $$
 
 3. 隨便砍一條邊就會不連通的連通圖：
 
-  
-
-  1. $G \mathrm{\ is\ connected}$, and
-  2. $\forall e \in E.  G' =  (V, E\setminus e)\mathrm{\ is\ not\ connected}$
+     1. $G \mathrm{\ is\ connected}$, and
+       4. $\forall e \in E.  G' =  (V, E\setminus e)\mathrm{\ is\ not\ connected}$
 
   
 
 4. 連通，而且邊數 = 點數 - 1 的圖：
 
+	  1. $G \mathrm{\ is\ connected}$, and 
+
+	  2. $|E| = |V| - 1$
+
   
-
-  1. $G \mathrm{\ is\ connected}$, and 
-
-  2. $|E| = |V| - 1$
-
-  	
 
 5. 無環，而且邊數 = 點數 - 1 的圖
 
-  
+	  1. $G \mathrm{\ is\ acyclic}$, and
 
-  1. $G \mathrm{\ is\ acyclic}$, and
+	  2. $|E| = |V| - 1$
 
-  2. $|E| = |V| - 1$
+		 
 
-  	
+6. 無環，  
 
-6. 無環，
+	  1. $G\ \mathrm{is\ acyclic}$
 
-  
+	  2. $\forall e \in \{(u_i, u_j) | u_i, u_j \in V, (u_i, u_j)\notin E\}.\forall G' \in \{(V,E\cup e)\}$.$G'\mathrm{\ is\ cyclic}$ 
 
-  1. $G\ \mathrm{is\ acyclic}$
-
-  2. $\forall e \in \{(u_i, u_j) | u_i, u_j \in V, (u_i, u_j)\notin E\}.\forall G' \in \{(V,E\cup e)\}$.$G'\mathrm{\ is\ cyclic}$ 
-
-  	
+		​	
 
 ### 證明
 
@@ -395,11 +376,11 @@ $$
 
      反證：
 
-         1. 如果不存在 path，顯然與連通的前提矛盾。
-         2. 若存在超過兩個相異 simple path，任選兩條 $p_1 = (a_0...a_{k_a})$, $p_2 = (b_0...b_{k_b})$，其中 $a_0 = b_0$, $a_{k_A} = b_{k_b}$。
-     	    1. 在 $p_1, p_2$ 中，選擇最小的 $k_1$ 與最小的 $k_2$，使得 $a_{k_1} = b_{k_2}$。以及次小的 $k_1', k_2'$，使得 $a_{k_1'} = b_{k_2'}$。
-     	    2. 這樣的 $k_1, k_2$ 與 $k_1', k_2'$必定存在，因為最差狀況下 $k_1 = 0, k_2 =0$，以及 $k_1' = a_{k_a}, k_2' = b_{k_b}$。
-     	    3. $p = (a_{k_1}...a_{k_1'},b_{k_2' - 1}...b_{b_{k_1}})$ 為一個 cycle。與前提矛盾。
+     1. 如果不存在 path，顯然與連通的前提矛盾。
+     2. 若存在超過兩個相異 simple path，任選兩條 $p_1 = (a_0...a_{k_a})$, $p_2 = (b_0...b_{k_b})$，其中 $a_0 = b_0$, $a_{k_A} = b_{k_b}$。
+         1. 在 $p_1, p_2$ 中，選擇最小的 $k_1$ 與最小的 $k_2$，使得 $a_{k_1} = b_{k_2}$。以及次小的 $k_1', k_2'$，使得 $a_{k_1'} = b_{k_2'}$。
+         2. 這樣的 $k_1, k_2$ 與 $k_1', k_2'$必定存在，因為最差狀況下 $k_1 = 0, k_2 =0$，以及 $k_1' = a_{k_a}, k_2' = b_{k_b}$。
+         3. $p = (a_{k_1}...a_{k_1'},b_{k_2' - 1}...b_{b_{k_1}})$ 為一個 cycle。與前提矛盾。
 
      
 
@@ -424,8 +405,6 @@ $$
      $$
 
      把 $\neg$ 塞進去之後得證原敘述成立。
-
- 
 
 
 
