@@ -295,9 +295,9 @@ $$
 1. 第一次 `ENQUEUE` 時，起始點 $s$ 被塞進 `Q` 裡，並且進行 $s.d = 0 = \delta(s, s)$。而因為此時 $s$ 已經被標為 `GRAY`，故進入迴圈之後，$d$ 值不可能再被更新。而這時：
 
 
-  $$
+$$
   \forall v \in V\setminus\{s\}．v.d = \infty \geq \delta(s, v)
-  $$
+$$
 
 2. 假定在執行過程時，對於任意在 $u$ 被 `DEQUEUE` 至 $u$ 被標為 `BLACK` 前被發現的 `WHITE` 點 $v$ ，由歸納法假設：
 
@@ -427,26 +427,62 @@ $$
 
 $G = (V, E)$ 是一張圖，假定從某一點 $s$ 開始進行 BFS，則：
 
-1. (所有 reachable 的點都可以被發現，而且 d 值就是最短路徑長)
+1. (所有 reachable 的點都可以被發現，且 d 值就是最短路徑長)
 
-	
-	$$
-	\begin{align}\forall u \in &V, s \overset{}{\leadsto}u.\newline\ & v.color=\mathrm{BLACK},\newline & v.d = \delta(s, v)\end{align}
-	$$
 
-2. (最短路徑)
+$$
+  \begin{align}\forall v \in &V, s \overset{}{\leadsto}v.\newline\ & v.color=\mathrm{BLACK},\newline & v.d = \delta(s, v)\end{align}
+$$
 
-	
-	$$
-	\begin{align}
-	\forall v \in V  &,s \overset{}{\leadsto}u,\ v \neq s. \newline
-	 \exists p'\in &\{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ u.\pi \}.\newline
-	& p' +\!\!\!\!+  v \in \{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ v. \}
-	\end{align}
-	$$
-	
+2. 存在由到父節點的最短路徑加一個邊形成的最短路徑：
 
-	
+
+$$
+  \begin{align}
+  \forall v \in V  &,s \overset{}{\leadsto}v,\ v \neq s. \newline
+   \exists p'\in &\{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ v.\pi \}.\newline
+  & p' +\!\!\!\!+  v \in \{\mathrm{shortest\ paths\ } \mathrm{from}\ s \ \mathrm{to}\ v. \}
+  \end{align}
+$$
+
+
+
+
+思路大致上是用歸納法：原點滿足上面兩個性質。而對於任意一個 reachable 的點
+
+
+
+假定存在點 $v$ , $v.d \neq \delta(s, v)$ (顯然該點不會是 $s$)，由 Lemma 可知：
+$$
+v.d \geq \delta(s, v)
+$$
+但因為 $v.d \neq \delta(s, v)$，故：
+$$
+v.d \gt \delta(s, v)
+$$
+又，可知 $s \leadsto v$，否則 $\delta(s, v) = \infty \geq v.d$。假定 $u$ 是在 shortest path 中，$v$ 的上一個父節點，
+
+
+
+對 $u.d = k$ 做歸納，說明對於每一個 $k$，如果 $\exists u \in Vu.d = k \Rightarrow u.d = \delta(s, u)$。
+
+$k = 0$ 時，顯然只有原點滿足，因此成立。
+
+當 $k = k' + 1$ 時，假設所有 $d  \leq k'$ 的點，都滿足 $\delta(s, v') = v'.d$，
+
+
+
+假定存在一個點 $u$，在依照某個 BFS 的「發現路徑」被發現，且 $u.d = k' + 1 \neq \delta(s, u)$。並且假定是在把點 $v$ Dequeue 時發現的。由歸納法假設有 $v.d = k' = \delta(s, v)$ 
+
+由 Lemma 知 $u.d = k' + 1 \geq \delta(s, u)$。但已知 $\delta(s, u) \neq k' + 1$，故 $k' + 1 > \delta(s, u)$，即 $k' \geq \delta(s, u)$。
+
+假定 $s \overset {p_{m}}{\leadsto} u$「是最短路徑」，並令 $v'$ 是最短路徑中，$u$ 的前一個點。由於 $p_{m}':= p_m \setminus\{u\}$ 是一條$s\overset{|p_m'| = k'}{\leadsto}v'$ 的路徑，因此 $\delta(s, v') \leq k' - 1$。由歸納法假設知： $v'.d = \delta(s, v') \leq k' - 1$。
+
+但這樣會發現 $v'$ 在 $v$ 之前被發現，又因為 $v'$ 跟 $u$ 相鄰，所以如果這時 $u$ 是 `WHITE`，那麼 $d$ 值應該要是 $k'$ 而非 $k' + 1$，因此矛盾。而如果這時 $u$ 不是 `WHITE`，那不管是 `GRAY` 或是 `BLACK`，都表示 $u$ 點比 $v'$ 早被 `DEQUEUE` 出來，所以 $d$ 應該要比 $k' - 1$ 更小，因此也矛盾。所以不管怎樣都矛盾，由反證法得知成立。
+
+「比較 BFS 發現路徑與最短路徑」
+
+「BFS 會給出一個發現 u 的路徑，Argue 這條路徑是其中一條最短路徑。方法就是如果他不是，那最短路徑就要比他短。」
 
 # Online Judge 
 
