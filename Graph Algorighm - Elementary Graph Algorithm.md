@@ -8,11 +8,12 @@
 
 概念上來說利用一個矩陣：
 $$
+\mathtt{
 w_{ij} = 
 \begin{cases}
-1 & \mathrm{if\ (u_i,u_j)} \in E \newline
-0 & \mathrm{otherwise}
-\end{cases}
+1 & \mathtt{if\ (u_i,u_j) \in E }\newline
+0 & \mathtt{otherwise}
+\end{cases}}
 $$
 實作上來說像是：
 
@@ -43,7 +44,7 @@ int main()
 
 
 $$
-(u, v) \in E \iff  v \in Adj[u]
+\mathtt{(u, v) \in E \iff  v \in Adj[u]}
 $$
 
 
@@ -166,6 +167,53 @@ int main()
 
 在 CLRS 中的 DFS 比較高級一點，會把進入時間跟結束時間一併紀錄。可以多新增`int d[N_MAX]`, `int pi[N_MAX]` ,   `int f[N_MAX]`  等等分別紀錄第 i 個點的結束時間，或是直接當作 `vis[i]` 的根據。
 
+### Parehthesis Theorem
+
+在對任一圖 $G = (V, E)$ 進行 DFS 時，任兩點 $v_i, v_j$ 的 $d$ 值與 $f$ 值，僅有下面 3 種狀況：
+
+1. $$\mathtt{[v_i.d, v_i.f] \cap [v_j.d, v_j.f] = \O}$$：這時兩點不互為父節點或子節點。
+2. $\mathtt{[v_i.d, v_i.f] \subset [v_j.d, v_j.f] }$：這時 $v_i$ 是 $v_j$ 的子節點。
+3. $\mathtt{ [v_j.d, v_j.f] \subset [v_i.d, v_i.f]}$：這時 $v_j$ 是 $v_i$ 的子節點。
+
+---
+
+觀察：要證上面的命題，只要證完下面這兩個：
+$$
+v_i.d < v_j.d 
+\begin{cases}
+v_i.f > v_j.d \Rightarrow v_i.f  > v_j.f & (\mathrm{claim\ 1}) \newline
+v_i.f <v_j.d  & (顯然兩區間沒交集)
+\end{cases}
+$$
+
+$$
+v_j.d < v_i.d 
+\begin{cases}
+v_j.f > v_i.d \Rightarrow v_j.f  > v_i.f & (\mathrm{claim\ 2}) \newline
+v_j.f <v_i.d  & (顯然兩區間沒交集)
+\end{cases}
+$$
+
+就可以證明。而第二個狀況顯然只是把第一個狀況 $i,j$ 對調。所以只要證 claim 1，claim 2 就自動對。
+
+1.  $v_i.d < v_j.d$，但 $v_i.f > v_j.d$，表示「$v_j$ 是 $v_i$ 為 `GRAY` 時發現的」，即 $\mathtt{DFS(G, v_j)}$ 是在 $\mathtt{DFS(G, v_j)}$ 內部被呼叫，因此 $v_j$ 是 $v_i$ 的子節點。
+2. 而 $v_i.f$ 必定在 $\mathtt{DFS\_VISIT(G, v_j)}$ 回傳後才會更新，所以 $v_i.f < v_j.f$。因此得證 claim 1。
+
+另外，在兩區間沒有交集時，表示任一點都不是為 `GRAY` 時發現的，因此不可能互為父子節點。
+
+#### Corollary (Nesting of descendants' intervals)
+
+假定 DFS 在一張圖 $G$ 上進行，則：
+$$
+v\ 是\ u\ 的子節點 \iff u.d < v.d < v.f < u.f
+$$
+
+---
+
+
+
+### White-Path Theorem 
+
 
 
 ## BFS
@@ -259,8 +307,6 @@ $$
 
 $G = (V, E)$ 是個圖（有向或無向），則：
 
-
-
 $$
 \forall s \in V.\forall (u, v) \in E.\delta(s, v) \leq \delta(s, u) + 1
 $$
@@ -281,10 +327,6 @@ $$
 ### Observation (每個點至多被 ENQUEUE 一次)
 
 由程式知：只有 `WHITE` 點會被 `ENQUEUE`，且 `ENQUEUE` 的前一刻會立刻被標記為 `GRAY`。如果有一個點被 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟，使它再度變為 `WHITE`。但程式中沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
-
-### 
-
-
 
 ### Lemma (d 值不短於最短路徑)
 
@@ -486,19 +528,20 @@ BFS 發現第一個白點時，也就是起始點 $s$ 時，$\delta(s, s) = 0 = 
 2. 假定 $s \overset {p_{m}}{\leadsto} v$ 是 $s$ 往 $v$ 的「最短路徑」，並令 $v'$ 是最短路徑中，$v$ 的前一個點。
 
 3. 由於 $p_{m}':= p_m \setminus\{v\}$ 必須是一條$s\overset{p_m'}{\leadsto}v'$ 的最短路徑，否則就可以構造出「更短的最短路徑」。由歸納法假設：
-	$$
-	\delta(s, v') = v'.d
-	$$
-	比較：
-	$$
-	\begin{align}
-	\delta(s, v) 
-	&= \delta(s, v') + 1 & (p_m, p'_m 都是最短路徑)\newline
-	&= v'.d + 1 &  (歸納法假設：v'.d = \delta(s,v'))\newline
-	&\leq u.d & (剛剛推論：u.d \geq \delta(s, v))\newline
-	&\Rightarrow v'.d \leq u.d - 1
-	\end{align}
-	$$
+  $$
+  \delta(s, v') = v'.d
+  $$
+  比較：
+  $$
+  \begin{align}
+  \delta(s, v) 
+  &= \delta(s, v') + 1 & (p_m, p'_m 都是最短路徑)\newline
+  &= v'.d + 1 &  (歸納法假設：v'.d = \delta(s,v'))\newline
+  &\leq u.d & (剛剛推論：u.d \geq \delta(s, v))\newline
+  &\Rightarrow v'.d \leq u.d - 1
+  \end{align}
+  $$
+
 
 
 但由上面推論，加上「d 值越小，越先 ENQUEUE」可發現：「 $v'$ 在 $u$ 之前被發現」。又因為 $v'$ 跟 $v$ 相鄰，所以：
