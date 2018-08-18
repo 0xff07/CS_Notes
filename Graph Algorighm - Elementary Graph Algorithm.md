@@ -282,6 +282,10 @@ $$
 
 由程式知：只有 `WHITE` 點會被 `ENQUEUE`，且 `ENQUEUE` 的前一刻會立刻被標記為 `GRAY`。如果有一個點被 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟，使它再度變為 `WHITE`。但程式中沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
 
+### 
+
+
+
 ### Lemma (d 值不短於最短路徑)
 
 
@@ -414,8 +418,6 @@ $$
 
 	而其他在 $v_1$ 被標為 `BLACK` 之前發現的點，$d$ 之大小都跟 $v_{f + 1}.d$ 相同，顯然加入 `Q` 之後，`Q` 也可以保持原性質。由此得證。 
 
-
-
 ### Corollary(d 值越小，越先 ENQUEUE)
 
 假定 BFS 過程中，$v_i$ 比 $v_j$ 先被 `ENQUEUE`，則：
@@ -435,7 +437,7 @@ $G = (V, E)$ 是一張圖，假定從某一點 $s$ 開始進行 BFS，則：
 
 
 $$
-\begin{align}\forall v \in &V, s \overset{}{\leadsto}v.\newline\ &  v.d = \delta(s, v) & (a)\newline & v.color=\mathrm{BLACK} & (b)\end{align}
+\begin{align}\forall v \in &V, s \overset{}{\leadsto}v.\newline\ &  v.d = \delta(s, v) & (a)\newline & v.color=\mathtt{BLACK} & (b)\end{align}
 $$
 
 2. 存在由到父節點的最短路徑加一個邊形成的最短路徑：
@@ -481,7 +483,7 @@ $V =  V' \cup \{v\}, |V|\gt |V'|$ 時：
 	u.d  \geq \delta(s, v)
 	$$
 
-2. 假定 $s \overset {p_{m}}{\leadsto} v​$ 是 $s​$ 往 $v​$ 的「最短路徑」，並令 $v'​$ 是最短路徑中，$v​$ 的前一個點。
+2. 假定 $s \overset {p_{m}}{\leadsto} v$ 是 $s$ 往 $v$ 的「最短路徑」，並令 $v'$ 是最短路徑中，$v$ 的前一個點。
 
 3. 由於 $p_{m}':= p_m \setminus\{v\}$ 必須是一條$s\overset{p_m'}{\leadsto}v'$ 的最短路徑，否則就可以構造出「更短的最短路徑」。由歸納法假設：
 	$$
@@ -503,6 +505,12 @@ $V =  V' \cup \{v\}, |V|\gt |V'|$ 時：
 
 1. 如果這時 $v$ 是 `WHITE`，那麼 $d$ 值應該要是 $v'.d + 1$，但 $v'.d + 1 \leq u.d <u.d + 1$ ，因此與「$u$ 是第一個發現 $v$ 的點」矛盾。
 2. 如果這時 $v$ 不是 `WHITE`，那不管是 `GRAY` 或是 `BLACK`，都表示 $v$ 點比 $v'$ 早被 `ENQUEUE` ，所以 $v.d \leq v'.d \leq u.d - 1$ ，仍然推到 $v.d \neq u.d + 1$，因此也矛盾。
+
+故不可能 $v.d \neq \delta(s, v)$。得證性質 (a)。
+
+由性質 (a) 可證性質 (b) ：假定 BFS 結束後，有些 reachable 的點沒有被搜尋到，因為 $d$ 值不會被更動，故 $d = \infty > \delta(s, v)$，故矛盾。
+
+性質 (c) 可以觀察到 $v.\pi = u \Rightarrow u.d + 1 = v.d$。因此沿著父節點一直往上找，找到 $d = 0$ 為止，就可以找到滿足該性質的最短路徑。
 
 # 參考資料
 
