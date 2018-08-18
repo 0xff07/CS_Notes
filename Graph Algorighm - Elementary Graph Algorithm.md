@@ -199,22 +199,70 @@ $$
 1.  $v_i.d < v_j.d$，但 $v_i.f > v_j.d$，表示「$v_j$ 是 $v_i$ 為 `GRAY` 時發現的」，即 $\mathtt{DFS(G, v_j)}$ 是在 $\mathtt{DFS(G, v_j)}$ 內部被呼叫，因此 $v_j$ 是 $v_i$ 的子節點。
 2. 而 $v_i.f$ 必定在 $\mathtt{DFS\_VISIT(G, v_j)}$ 回傳後才會更新，所以 $v_i.f < v_j.f$。因此得證 claim 1。
 
-另外，在兩區間沒有交集時，表示任一點都不是為 `GRAY` 時發現的，因此不可能互為父子節點。
+另外，在兩區間沒有交集時，表示任一點都不是另一點為 `GRAY` 時發現的，因此不可能互為父子節點。
 
 #### Corollary (Nesting of descendants' intervals)
 
-假定 DFS 在一張圖 $G$ 上進行，則：
+對一張圖 $G$ 進行 DFS 時：
 $$
-v\ 是\ u\ 的子節點 \iff u.d < v.d < v.f < u.f
+\mathtt {DFS\ 過程中，}v\ 是\ u\ 的子節點 \iff u.d < v.d < v.f < u.f
 $$
 
 ---
 
-
+由 Parenthesis Theorem 顯然成立。
 
 ### White-Path Theorem 
 
+對一張圖 $G = (V, E)$ 進行 DFS 時：
+$$
+\mathtt {DFS\ 過程中，}v\ 是\ u\ 的子節點 \iff 在發現\ u\ 時，\exist u \overset{p}{\leadsto} v.\forall v' \in p. \mathtt{v'.color == WHITE}
+$$
 
+---
+
+「$\Rightarrow$」
+
+假定 $u = v$，命題顯然成立
+
+假定 $u \neq v$，則由 Nesting of descendants' intervals 知：對於任意子節點 $v'$，均有 $u.d < v'.d$。所以：
+
+1. 在 `time==u.d` 時，任意子節點 `v'` 都是 `WHITE` 。
+2. 而 $v$ 是 $u$ 在進行 DFS 時的子節點，表示存在 DFS 構造出的，一條往 $v$ 的路徑，而且這些路徑上的任一點都是 $u$ 的子節點。
+3. 由 2. 知這條路徑上所有的點，必定都是 `WHITE`
+
+「$\Leftarrow$」
+
+反證：假定 DFS 時， $u \overset{p}{\leadsto} v'$ 是一條全白路徑，但路徑中某存在一些不是 $u$ 的子節點的點。 令這些點中離 $u$ 最近的為 $v$。
+
+1. 假定 $w$ 是白路上，$v$ 的前一個點，或是 $w = u$。因為白路上 $v$ 以前的點，都是 $u$ 的子節點，故由 「Nesting of descendants' intervals」：
+	$$
+	\begin{align}
+	&u.d \leq w.d < w.f \leq u.f \Rightarrow w.d < u.f & (1)
+	\end{align}
+	$$
+
+2. 另一方面，在 $u$ 為 `GRAY` 時，$v$ 仍為 `WHITE`，故 $v$ 必定在 $u$ 之後被發現。由 「Nesting of descendants' intervals」，若 $u$ 不為 $v$ 的子節點，則：
+	$$
+	\begin{align}
+	&u.d < u.f < v.d < v.f  \Rightarrow u.d < v.f& (2)
+	\end{align}
+	$$
+	(等一下會用到它)
+
+3. 將 $w$ 由 `WHITE` 轉為 `GRAY` 時，討論 $v$ 的顏色：
+
+	如果 $v$ 不為 `WHITE`，則 $v.f < w.d$。加上 (1) (2) 知道：
+	$$
+	u.d < v.f < w.d < u.f
+	$$
+	由 「Nesting of descendants' intervals」 知道 $v.d$ 唯一可能狀況是 $u.d< v.d < v.f \leq u.f$，但這表示 $v$ 是 $u$ 的子節點，因此矛盾。
+
+4. 如果 $v$ 仍為 `WHITE`， 又分兩種狀況：
+
+	如果 $v$ 在搜索 $w$ 的白子節點過程中，被標為 `WHITE` 以外的顏色：那 $v$ 就是 $w$ 的子節點。矛盾。
+
+	如果 $v$ 在搜索 $w$ 的白子節點過程中，沒有被標為 `WHITE` 以外的顏色：$v$ 仍然為 `WHITE`，那 $v$ 就會是 DFS 時下一個被標成 `GRAY` 的點，依然是 $w$ 的子節點，也是 $u$ 的子節點，因此也矛盾。
 
 ## BFS
 
@@ -273,11 +321,11 @@ void bfs(int start)
 
 實際上可以發現頂點的狀態要嘛從頭到尾都是 `WHITE` (也就是不 reachable)，要不然就是依照 `WHITE-GRAY-BLACK` 的順序上色，最後被 `POP` 出來，並不會由黑轉灰，或是由黑轉白，所以實作上不用特地開 `enum` 標註顏色狀態，只要讓知道哪個點有走過就好。
 
-## Shortest Path
+### Shortest Path
 
 這邊討論的最短路徑是「通過最少數目的邊，到達另外一點」，是以「邊的數目」決定路徑長度，尚沒有權重的概念。
 
-### Definition (Shortest-Path Distance)
+#### Definition (Shortest-Path Distance)
 
 $G = (V, E)$ 是個圖，Shortest-Path Distance 定義為：
 
@@ -292,7 +340,7 @@ $$
 \end{align}
 $$
 
-### Definition (Shortest Path)
+#### Definition (Shortest Path)
 
 
 $$
@@ -303,7 +351,7 @@ p\mathrm{\ is\ a\ shortest\ past\ from\ u\ to\ v} \iff
 $$
 
 
-### Lemma (最短路徑性質)
+#### Lemma (最短路徑性質)
 
 $G = (V, E)$ 是個圖（有向或無向），則：
 
@@ -512,7 +560,7 @@ BFS 發現第一個白點時，也就是起始點 $s$ 時，$\delta(s, s) = 0 = 
 
 接著觀察：
 
-1. 由「d 值不短於最短路徑」知 $v.d \geq \delta(s, v)$ 要成立，又反證法假定兩者不等，因此：
+1. 由「Lemma(d 值不短於最短路徑)」知 $v.d \geq \delta(s, v)$ 要成立，又反證法假定兩者不等，因此：
 	$$
 	\begin{align}
 	v.d &= u.d + 1 &(\mathrm{BFS}\ 規定的)\newline
@@ -528,26 +576,25 @@ BFS 發現第一個白點時，也就是起始點 $s$ 時，$\delta(s, s) = 0 = 
 2. 假定 $s \overset {p_{m}}{\leadsto} v$ 是 $s$ 往 $v$ 的「最短路徑」，並令 $v'$ 是最短路徑中，$v$ 的前一個點。
 
 3. 由於 $p_{m}':= p_m \setminus\{v\}$ 必須是一條$s\overset{p_m'}{\leadsto}v'$ 的最短路徑，否則就可以構造出「更短的最短路徑」。由歸納法假設：
-  $$
+$$
   \delta(s, v') = v'.d
-  $$
+$$
   比較：
-  $$
-  \begin{align}
+$$
+\begin{align}
   \delta(s, v) 
   &= \delta(s, v') + 1 & (p_m, p'_m 都是最短路徑)\newline
   &= v'.d + 1 &  (歸納法假設：v'.d = \delta(s,v'))\newline
   &\leq u.d & (剛剛推論：u.d \geq \delta(s, v))\newline
-  &\Rightarrow v'.d \leq u.d - 1
+  &\Rightarrow v'.d \leq u.d - 1 \newline
+  & \Rightarrow v'.d < u.d
   \end{align}
-  $$
+$$
 
+但由 $v'.d < u.d$，加上「Lemma(d 值越小，越先 ENQUEUE)」可發現：「 $v'$ 在 $u$ 之前被發現」。又因為 $v'$ 跟 $v$ 相鄰，所以：
 
-
-但由上面推論，加上「d 值越小，越先 ENQUEUE」可發現：「 $v'$ 在 $u$ 之前被發現」。又因為 $v'$ 跟 $v$ 相鄰，所以：
-
-1. 如果這時 $v$ 是 `WHITE`，那麼 $d$ 值應該要是 $v'.d + 1$，但 $v'.d + 1 \leq u.d <u.d + 1$ ，因此與「$u$ 是第一個發現 $v$ 的點」矛盾。
-2. 如果這時 $v$ 不是 `WHITE`，那不管是 `GRAY` 或是 `BLACK`，都表示 $v$ 點比 $v'$ 早被 `ENQUEUE` ，所以 $v.d \leq v'.d \leq u.d - 1$ ，仍然推到 $v.d \neq u.d + 1$，因此也矛盾。
+1. 如果這時 $v$ 是 `WHITE`，那麼 $d$ 值應該要是 $v'.d + 1$，但 $v'.d + 1  <u.d + 1$ ，因此與「$u$ 是第一個發現 $v$ 的點」矛盾。
+2. 如果這時 $v$ 不是 `WHITE`，那不管是 `GRAY` 或是 `BLACK`，都表示 $v$ 點比 $v'$ 早被 `ENQUEUE` ，所以 $v.d \leq v'.d < u.d $ ，仍然推到 $v.d \neq u.d + 1$，因此也矛盾。
 
 故不可能 $v.d \neq \delta(s, v)$。得證性質 (a)。
 
