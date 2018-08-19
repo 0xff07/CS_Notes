@@ -221,7 +221,7 @@ $$
 
 ---
 
-「$\Rightarrow$」
+($\Rightarrow$)：使用歸納法
 
 假定 $u = v$，命題顯然成立
 
@@ -231,7 +231,7 @@ $$
 2. 而 $v$ 是 $u$ 在進行 DFS 時的子節點，表示存在 DFS 構造出的，一條往 $v$ 的路徑，而且這些路徑上的任一點都是 $u$ 的子節點。
 3. 由 2. 知這條路徑上所有的點，必定都是 `WHITE`
 
-「$\Leftarrow$」
+($\Leftarrow$)：
 
 反證：假定 DFS 時， $u \overset{p}{\leadsto} v'$ 是一條全白路徑，但路徑中某存在一些不是 $u$ 的子節點的點。 令這些點中離 $u$ 最近的為 $v$。
 
@@ -263,6 +263,71 @@ $$
 	如果 $v$ 在搜索 $w$ 的白子節點過程中，被標為 `WHITE` 以外的顏色：那 $v$ 就是 $w$ 的子節點。矛盾。
 
 	如果 $v$ 在搜索 $w$ 的白子節點過程中，沒有被標為 `WHITE` 以外的顏色：$v$ 仍然為 `WHITE`，那 $v$ 就會是 DFS 時下一個被標成 `GRAY` 的點，依然是 $w$ 的子節點，也是 $u$ 的子節點，因此也矛盾。
+
+
+
+### DFS Forest
+
+DFS 搜索結束後，定義  $G_{\pi}$ ：
+$$
+\begin{cases}
+G_{\pi} = (V, E_{\pi}) \newline\newline
+E_{\pi} = \{(v.\pi, v):v \in V,\text{and }v.\pi \neq \text{NIL}\}
+\end{cases}
+$$
+則 $G_{\pi}$ 是一個 Forest，稱作 DFS Forest。
+
+---
+
+因為除了那些起始點以外，所有點恰好有一個父節點，而且該節點不是會自己，因為如果要自己發現自己，自己要是 `GRAY` ，但又要是 `WHITE`，顯然不可能。因此對於暪一個起始點長出的子樹，都有 $|E| = |V|-1 $。
+
+### Classification of Edges
+
+1. Tree Edge : 
+
+	$u, v \in V$。若 $v$ 是在 DFS 時，探索 $e = (u, v) \in E$ 時被發現，則稱 $e$ 為 tree edge。
+
+2. Back Edge：
+
+	$u, v \in V$。若在 DFS 時，$u$ 是 $v$ 的父節點，且 $e = (v, u) \in E$，則稱 $e$ 為 back edge。
+
+3. Forward Edge:
+
+	$u, v \in V$。若在 DFS 時，$u$ 是 $v$ 的父節點，且 $e = (u, v) \in E$，但 $e \not \in E_{\pi}$，則稱 $e$ 為 forward edge。
+
+4. Cross Edge:
+
+	不是 Tree Edge, 不是 Back Edge, 不是 Forward Edge 的邊。比如說連接兩顆 DFS Tree 的邊。
+
+---
+
+#### Thm (Edge Classification)
+
+在 DFS 第一次探索 $(u, v)$ 時：
+
+1. 若 $\mathtt{v.color == WHITE}$，則 $(u, v)$ 是 Tree Edge
+2. 若 $\mathtt{v.color == GRAY}$，則 $(u, v)$ 是 Back Edge
+3. 若 $\mathtt{v.color == BLACK}$，則 $(u, v)$ 是 Forward Edge 或 Cross Edge。
+
+---
+
+1. 根據 DFS，如果第一次探索 $(u, v)$ 時，$v$ 為 `WHITE`，則下一步就是把它變成 `GRAY`，而這時 $u$ 也是 `GRAY`，所以 $v$ 是 $u$ 的子節點，因此 $(u, v)$ 為 Tree Edge。
+2. 若發現 $v$ 為 `GRAY`，表示 $v$ 在 $u$ 之前被發現，而且仍未探索完所有子節點。因此 $u$ 是 $v$ 在探索子節點時發現的子節點之一，所以 $(u, v)$ 是個 Back Edge
+3. 有兩種可能：$u.d < v.d$ 或 $u.d > v.d$。
+	1. 若為前者，則由 Nesting 知表示 $v$ 是 $u$ 的子節點，但因為第一次探索 $(u, v)$ 時，$v$ 已經非 `WHITE`，故 $v$ 並不是透過 $(u, v)$ 發現，因此 $v.\pi \neq u$，故不為 Tree edge。
+	2. 若為後者，則由 Nesting  知 $u, v$ 不互為父、子節點。因此不可能滿足前 3 種邊。
+
+#### Thm (Edge of Undirected Graph)
+
+假定 $G = (V, E)$ 是個無向圖，則在 DFS 進行結束後，只可能是 Tree Edge 或 Back Edge。
+
+---
+
+對於任意一個邊 $(u, v) \equiv (v, u)$，兩個點中一定有一個點比另外一個點先被發現。WLOG 假定 $u.d < v.d$。則 $v$ 是在 $u$ 正為灰色時，被由白圖灰的。
+
+假定這第一次走這條邊時，是從 $u$ 出發走到 $v$，這時 $v$ 一定是白，不然這條邊在 $v$ 所完之前，$u$ 都不會動它。也就是只能由 $v$ 從 $(v, u)$ 方向探索，矛盾。所以 $(u, v)$ 是 tree edge。
+
+假定第一次走這條邊時，是從 $v$ 出發走到 $u$，這時 $u$ 已經為 `GRAY`，因此由定義知 $(v, u) = (u, v)$ 是 back edge。
 
 ## BFS
 
