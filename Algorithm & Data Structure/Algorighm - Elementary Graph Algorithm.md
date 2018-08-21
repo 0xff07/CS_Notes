@@ -17,26 +17,12 @@ w_{ij} =
 $$
 實作上來說像是：
 
-
-
 ```C
 #define N_MAX 20
 int W[N_MAX][N_MAX];
-int main()
-{
-    int i, j, weight;
-	while(scanf("%d%d%d", &i, &j, &weight) != EOF) {
-    	W[i][j] = 1;
-    }
-	return 0;
-}
 ```
 
-
-
 雖然感覺很肥，很多 Adjacency List 中 $O(V + E)$ 的演算法這邊會變成 $O(V)$，但是如果邊沒有權重的話，可以用 bit field 壓縮空間。而且如果圖很稠密，那麼 Adjacency List 跟 Adjacency Matrix 的複雜度相去不遠，但實作上相較之下較便利。
-
-
 
 ## Adjacency List
 
@@ -55,7 +41,10 @@ $$
 
 # define N_MAX 1000
 vector <int> W[N_MAX];
-
+vector <vector<int>> W_2;
+```
+存圖用 `push_back()`：
+```c++
 int main()
 {
     int i, j;
@@ -66,11 +55,7 @@ int main()
 }
 ```
 
-
-
-然後發現如果有邊的話不知道要怎麼做。自己刻一個資料結構，或是開一個陣列存權重：
-
-
+若邊帶權重或其他資訊，可以手刻個資料結構，或是開一個陣列存：
 
 ```C++
 struct edge{
@@ -79,17 +64,7 @@ struct edge{
 	int w;
 	edge(int _i, int _j, int _w):i(_i),j(_j),w(_w){}
 };
-
 vector <edge> W[N_MAX];
-
-int main()
-{
-    int i, j, w;
-	while(scanf("%d%d%d", &i, &j, &w) != EOF) {
-    	W[i].push_back(edge(i, j, w));
-    }
-	return 0;
-}
 ```
 
 # Trasversal
@@ -141,7 +116,7 @@ void dfs(int n, vector<int> *G)
 {
     vis[n] = 1;
 	/* GRAY area for u after this line */
-    for (auto &i in G[n]) {
+    for (auto &i : G[n]) {
     	if (!vis[i]) {
             /* WHITE area for i*/
             dfs(i, G);
@@ -165,9 +140,11 @@ int main()
 
 
 
-在 CLRS 中的 DFS 比較高級一點，會把進入時間跟結束時間一併紀錄。可以多新增`int d[N_MAX]`, `int pi[N_MAX]` ,   `int f[N_MAX]`  等等分別紀錄第 i 個點的結束時間，或是直接當作 `vis[i]` 的根據。
+在 CLRS 中的 DFS 比較高級一點，會把進入時間跟結束時間一併紀錄。可以多新增`int d[N_MAX]`, `int pi[N_MAX]` ,   `int f[N_MAX]`  等等分別紀錄第 i 個點的結束時間，或是直接寫在 `vis[i]` 裡。
 
-### Parehthesis Theorem
+---
+
+### Thm (Parehthesis Theorem)
 
 在對任一圖 $G = (V, E)$ 進行 DFS 時，任兩點 $v_i, v_j$ 的 $d$ 值與 $f$ 值，僅有下面 3 種狀況：
 
@@ -212,7 +189,9 @@ $$
 
 由 Parenthesis Theorem 顯然成立。
 
-### White-Path Theorem 
+---
+
+### Thm (White-Path Theorem) 
 
 對一張圖 $G = (V, E)$ 進行 DFS 時：
 $$
@@ -264,9 +243,9 @@ $$
 
 	如果 $v$ 在搜索 $w$ 的白子節點過程中，沒有被標為 `WHITE` 以外的顏色：$v$ 仍然為 `WHITE`，那 $v$ 就會是 DFS 時下一個被標成 `GRAY` 的點，依然是 $w$ 的子節點，也是 $u$ 的子節點，因此也矛盾。
 
+---
 
-
-### DFS Forest
+### Def (DFS Forest)
 
 DFS 搜索結束後，定義  $G_{\pi}$ ：
 $$
@@ -281,7 +260,7 @@ $$
 
 因為除了那些起始點以外，所有點恰好有一個父節點，而且該節點不是會自己，因為如果要自己發現自己，自己要是 `GRAY` ，但又要是 `WHITE`，顯然不可能。因此對於暪一個起始點長出的子樹，都有 $|E| = |V|-1 $。
 
-### Classification of Edges
+### Def (Classification of Edges)
 
 1. Tree Edge : 
 
@@ -390,7 +369,7 @@ void bfs(int start)
 
 這邊討論的最短路徑是「通過最少數目的邊，到達另外一點」，是以「邊的數目」決定路徑長度，尚沒有權重的概念。
 
-#### Definition (Shortest-Path Distance)
+#### Def (Shortest-Path Distance)
 
 $G = (V, E)$ 是個圖，Shortest-Path Distance 定義為：
 
@@ -405,7 +384,9 @@ $$
 \end{align}
 $$
 
-#### Definition (Shortest Path)
+---
+
+#### Def (Shortest Path)
 
 
 $$
@@ -415,6 +396,7 @@ p\mathrm{\ is\ a\ shortest\ past\ from\ u\ to\ v} \iff
 \end{cases}
 $$
 
+---
 
 #### Lemma (最短路徑性質)
 
@@ -424,8 +406,9 @@ $$
 \forall s \in V.\forall (u, v) \in E.\delta(s, v) \leq \delta(s, u) + 1
 $$
 
-1. 假定 $s\ u\mathrm{\ not\ reachable}$，則 $\delta(s, u) = \infty$，命題成立。
+---
 
+1. 假定 $s\ u\mathrm{\ not\ reachable}$，則 $\delta(s, u) = \infty$，命題成立。
 2. 假定 $s\ u\mathrm{\ reachable}$，則存在一條長度 $\delta(s, u)$ 的最短路徑 $p' = \langle s...u \rangle$，則路徑 $p = p' \cup \{v\}$ 是一條 $u, v$ 間的路徑（未必是最短），長度為 $\delta(s, u) + 1$。因為任何路徑長度都 $\leq$ 最短路徑長度，故：
 
   
@@ -436,10 +419,14 @@ $$
 
 「=」：如果 $u$ 是 $s, v$ 最短路徑上的前一個點？
 
+---
+
 
 ### Observation (每個點至多被 ENQUEUE 一次)
 
 由程式知：只有 `WHITE` 點會被 `ENQUEUE`，且 `ENQUEUE` 的前一刻會立刻被標記為 `GRAY`。如果有一個點被 `ENQUEUE` 兩次，表示存在「將點標成 `WHITE`」 的步驟，使它再度變為 `WHITE`。但程式中沒有任何動作會將顏色由 `WHITE` 以外的顏色變成 `WHITE`。
+
+---
 
 ### Lemma (d 值不短於最短路徑)
 
@@ -486,11 +473,9 @@ $$
 
 > 白話文： d 值有限表示兩者有能透過 BFS 到達該點，路徑長為 d 的「發現路徑」。又因為「任意路徑比最短路徑長」，所以這個性質聽起來很合理。 而如果兩點不 reachable，d 值無限，此性質顯然成立。
 
-
+---
 
 ### Lemma (Q 中 d 遞增，但只有兩種可能值)
-
-
 
 在對 $G = (V, E)$ 進行 BFS 的過程中的某個時候，假定 $Q$ 當中的元素依序為：
 
@@ -516,62 +501,64 @@ $$
 
 * 在進行某次 `ENQUEUE` 前，假定此時 `Q` 中的元素為：
 
-	
-	$$
-	Q = \langle v_1 ... v_f \rangle
-	$$
-	且滿足原性質：
 
-	
-	$$
-	\begin{cases}
-	v_f.d \leq   v_1.d + 1 & (1)\newline\newline
-	\forall i\in \{1,.,f-1\}.v_i.d \leq v_{i + 1}.d \Rightarrow v_1.d \leq v_2.d & (2)\newline
-	\end{cases}
-	$$
-	並且接下來要把 $v_{1}$ 從 `Q` `DEQUEUE`。令 $v_{f + 1}$ 是一個在 $v_0$ 被標記為 `BLACK` 前新發現的節點（如果這樣的節點不存在，性質 (2) 顯然成立; 又因為 $v_2.d + 1 \geq v_1.d + 1$，故性質 (1) 也會成立）由 BFS 步驟知：
+$$
+  Q = \langle v_1 ... v_f \rangle
+$$
+  且滿足原性質：
 
-	
-	$$
-	v_{f + 1} = v_1.d + 1
-	$$
-	由 (2) 可以得到：
 
-	
-	$$
-	v_1.d \leq v_2.d \Rightarrow v_{f + 1}.d = v_1.d + 1 \leq v_2.d + 1
-	$$
-	故：
+$$
+  \begin{cases}
+  v_f.d \leq   v_1.d + 1 & (1)\newline\newline
+  \forall i\in \{1,.,f-1\}.v_i.d \leq v_{i + 1}.d \Rightarrow v_1.d \leq v_2.d & (2)\newline
+  \end{cases}
+$$
+  並且接下來要把 $v_{1}$ 從 `Q` `DEQUEUE`。令 $v_{f + 1}$ 是一個在 $v_0$ 被標記為 `BLACK` 前新發現的節點（如果這樣的節點不存在，性質 (2) 顯然成立; 又因為 $v_2.d + 1 \geq v_1.d + 1$，故性質 (1) 也會成立）由 BFS 步驟知：
 
-	
-	$$
-	v_{f + 1}.d \leq v_2.d + 1
-	$$
-	因此性質 2. 成立。
 
-	
+$$
+  v_{f + 1} = v_1.d + 1
+$$
+  由 (2) 可以得到：
 
-	又因為： 
-	$$
-	v_{f}.d \leq v_1.d + 1 = v_{f + 1}.d
-	$$
-	加上由歸納法假設已知：
 
-	
-	$$
-	v_1.d \leq v_2.d \leq...\leq v_f.d
-	$$
-	因此：
+$$
+  v_1.d \leq v_2.d \Rightarrow v_{f + 1}.d = v_1.d + 1 \leq v_2.d + 1
+$$
+  故：
 
-	
-	$$
-	v_2.d \leq...\leq v_f.d \leq v_{f + 1}.d
-	$$
-	
 
-	故知對於 `DEQUEUE` 之後第一個新找到的節點，在 `ENQUEUE` 之後仍然能使 `Q` 中的元素保持原命題。
+$$
+  v_{f + 1}.d \leq v_2.d + 1
+$$
+  因此性質 2. 成立。
 
-	而其他在 $v_1$ 被標為 `BLACK` 之前發現的點，$d$ 之大小都跟 $v_{f + 1}.d$ 相同，顯然加入 `Q` 之後，`Q` 也可以保持原性質。由此得證。 
+
+
+  又因為： 
+$$
+  v_{f}.d \leq v_1.d + 1 = v_{f + 1}.d
+$$
+  加上由歸納法假設已知：
+
+
+$$
+  v_1.d \leq v_2.d \leq...\leq v_f.d
+$$
+  因此：
+
+
+$$
+  v_2.d \leq...\leq v_f.d \leq v_{f + 1}.d
+$$
+
+
+  故知對於 `DEQUEUE` 之後第一個新找到的節點，在 `ENQUEUE` 之後仍然能使 `Q` 中的元素保持原命題。
+
+  而其他在 $v_1$ 被標為 `BLACK` 之前發現的點，$d$ 之大小都跟 $v_{f + 1}.d$ 相同，顯然加入 `Q` 之後，`Q` 也可以保持原性質。由此得證。 
+
+---
 
 ### Corollary(d 值越小，越先 ENQUEUE)
 
@@ -580,9 +567,13 @@ $$
 $$
 v_i\ 比\ v_j\ 先\ \mathtt{ENQUEUE} \iff v_i.d \leq v_j.d
 $$
+---
+
 因為每一個點只會被 `ENQUEUE` 一次，`ENQUEUE` 之後 $d$ 立刻被指定值與上色，之後就再也不可能被重複發現。所以一個點只會被指定一次 $d$ 值。
 
 因為 Queue 的性質，先 `ENQUEUE` 者會先 `DEQUEUE` ，但每次 `DEQUEUE` 時，該元素之 $d$ 值將 $\leq$ 所有 Queue 中的元素，包含前一個元素。由此遞推下去，即可證明該命題。
+
+---
 
 ### Thm (Correctness of BFS)
 
