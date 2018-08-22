@@ -72,9 +72,9 @@ $$
 
 ## Thm (合併 MST)
 
-$G = (V, E)$ 是一張無向圖，且 $G$ 連通。$w : E \to \R$ 是一個權重函數。假定存在一個 MST，$T$，使：
+$G = (V, E)$ 是一張無向圖，且 $G$ 連通。$w : E \to \R$ 是一個權重函數。若：
 $$
-A \subseteq E\left(T\right)
+\exist T',T'\text{ is a MST}.A \subseteq E\left(T'\right)
 $$
  且：
 $$
@@ -84,20 +84,20 @@ $$
 $$
 \begin{align}
 (u, v) & \text{ is a light edge crossing }(S, V - S) \newline 
-& \Rightarrow A \cup \{(u,v)\} \subseteq E(T)\newline
+& \Rightarrow \exist T,T\text{ is a MST}.A \cup \{(u,v)\} \subseteq E(T)\newline
 &
 \end{align}
 $$
 
 ---
 
-假定 $T'$ 是一個不含 $(u, v)$ 的 MST。
+假定 $T'$ 是一個不含 $(u, v)$ 的 MST，且 $A \subseteq T'$。
 
 1. 因 $T'$ 是 MST，故 $\exists (x, y) \in T'$.$(x, y)$ crosses $(S, V - S)$ 。否則 $(S,V-S)$ 之間的點不連通。
 2. 但 $T'$ 中連接 $(S, V - S)$ 的邊只能有一條，否則將形成環，與 $T'$ 是樹的前提矛盾。
 3. 因此，$(x,y)$ 是 $T'$ 中連接 $(S,V-S)$ 的唯一邊。
 
-因為 $A$ respects $(S, V-S)$，故可以知道
+因為 $A$ respects $(S, V-S)$，故可知：
 $$
 (x, y) \not\in A
 $$
@@ -111,18 +111,18 @@ $$
 
 2. 但 $T'$ 又加上了 $\{(u, v)\}$ ，因此兩棵樹又恢復連通，變回一棵樹。
 
-3. $A \subseteq T$：因為定義 $T$ 時唯一被去掉的邊 $(x, y) \not\in A$：
+3. $A \subseteq T$。因為定義 $T$ 時，唯一被去掉的邊 $(x, y) \not\in A$：
 	$$
 	\begin{cases}
-	A \subseteq T'\newline
-	T = T' \setminus\{(x, y)\}\cup \{(u, x)\}\newline
-	(x, y) \not \in A
+	A \subseteq T' & (\text{前提})\newline
+	T = T' \setminus\{(x, y)\}\cup \{(u, x)\} & (\text{$T'$ 的定義})\newline
+	(x, y) \not \in A  & (\text{A respects})
 	\end{cases}
 	\Rightarrow A \subseteq T
 	$$
 
 
-這時計算 $T'$ 的權重：
+這時計算 $T$ 的權重：
 $$
 \begin{align}
 w(T) &= w(T') - w(x,y) + w(u,v) \newline
