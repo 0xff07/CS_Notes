@@ -44,6 +44,7 @@ vector <int> W[N_MAX];
 vector <vector<int>> W_2;
 ```
 存圖用 `push_back()`：
+
 ```c++
 int main()
 {
