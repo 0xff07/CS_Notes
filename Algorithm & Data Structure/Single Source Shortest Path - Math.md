@@ -67,7 +67,7 @@ $$
 $$
 \begin{align}
 \forall 0& \leq i \leq j \leq k.\newline
-&p_{ij} = \langle v_i ... v_j \rangle \text{ is a shortest path from $v_i$ to $v_j$}
+&\langle v_i ... v_j \rangle \text{ is a shortest path from $v_i$ to $v_j$}
 \newline
 \end{align}
 $$
@@ -78,13 +78,13 @@ $$
 
 ## Observation (最短路徑沒有環)
 
-### Observation (有負環，沒最短路徑)
+### (有負環，沒最短路徑)
 
 假定 $p$ 是一個最短路徑，而且中間有一個負環。那麼多繞一圈負環就會產生一個更短的最短路徑。矛盾。
 
 ---
 
-### Observation (最短路徑沒有正環)
+### (最短路徑沒有正環)
 
 把所有環砍掉後會得到一條更短的最短路徑。
 
@@ -115,40 +115,6 @@ $$
 \end{align}
 $$
 則稱 $G'$ 是一個「Shortest Path Tree」。
-
----
-
-## (Algo) Relaxaton
-
-```pseudocode
-REXATION (u, v, w)
-if v.d > u.d + w(u, v)
-	v.d = u.d + w.d
-	v.pi = u
-```
-
-### Thm (Upper-Bound Property)
-
-無論程式對 $G$ 執行多少次 `RELAX` ：
-$$
-\begin{align}
-\forall & v \in V.\newline
-& v.d \geq \delta(s, v)
-\end{align}
-$$
-且在任意時刻，若：
-$$
-v.d = \delta(s, v)
-$$
-則在這之後，任意次的 Relax 都不會影響 $v.d$ 的值。
-
----
-
-### Thm (No-Path Property)
-
-$$
-\neg (\exists p.s \overset{p}{\leadsto}v) \Rightarrow v.d = \delta(s,v) = \infty 
-$$
 
 ---
 

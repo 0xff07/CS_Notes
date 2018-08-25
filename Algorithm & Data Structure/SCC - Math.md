@@ -19,6 +19,7 @@ $$
 \text{SCC is the equivalent class of  "mutually reachable"}
 $$
 
+---
 
 ### Observation (轉置後 SCC 不變)
 
@@ -110,6 +111,8 @@ $$
 ---
 
 如果把 SCC 收縮之後的圖想成 DAG，再用 DAG 的性質下去做感覺也可以？
+
+---
 
 ### Corollary 
 
