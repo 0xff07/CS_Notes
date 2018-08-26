@@ -4,16 +4,14 @@
 
 ### 輸入
 
-一張圖 $G = (V, E)$ ，權重函數 $w : E \to \R$，某一個起點 $s \in V$。
+一張圖 $G = (V, E)$ ，權重函數 $w : E \to \R$，某一個起點 $s \in V$，且 $G$ 沒有可以從 $s$ 到達的負環。
 
 ### 輸出
 
 對於任意 $v \in V$，尋找路徑 $s\overset{p}{\leadsto}v$，使得：
 $$
-w(p) = \sum_{e \in p} w(e)
+w(p) := \sum_{e \in p} w(e) = \delta(s, v)
 $$
-最小。
-
 ## Def (Shortest Path Weight)
 
 $$
@@ -100,10 +98,13 @@ $$
 
 若 $G'$ 滿足：
 $$
-G'(V', E'),\text{ where }\begin{cases}
+\begin{align}
+& G'(V', E'),\text{ where }\begin{cases}
 V' = \{u \mid u \in V, s \leadsto u\} \newline
 E' \subseteq E
 \end{cases}
+& (1)
+\end{align}
 $$
 
 
@@ -111,7 +112,8 @@ $$
 $$
 \begin{align}
 \forall v & \in V.\exists!\ p. \newline 
-& s\overset{p} {\rightsquigarrow} v \text{,  and   }w(p) = \delta(s, v)
+& s\overset{p} {\rightsquigarrow} v \text{,  and   } & (2)
+\newline & w(p) = \delta(s, v) & (3)
 \end{align}
 $$
 則稱 $G'$ 是一個「Shortest Path Tree」。

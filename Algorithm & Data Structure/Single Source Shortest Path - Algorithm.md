@@ -4,19 +4,17 @@
 
 ### 輸入
 
-一張圖 $G = (V, E)$ ，權重函數 $w : E \to \R$，某一個起點 $s \in V$，且 $G$ 沒有負環。
+一張圖 $G = (V, E)$ ，權重函數 $w : E \to \R$，某一個起點 $s \in V$，且 $G$ 沒有可以從 $s$ 到達的負環。
 
 ### 輸出
 
-對於任意 $v \in V$，尋找路徑 $s\overset{p}{\leadsto}v$，使得：
+對於任意 $v \in V$，在初始化過後，尋找路徑 $s\overset{p}{\leadsto}v$，使得：
 $$
-w(p) = \sum_{e \in p} w(e)
+w(p) := \sum_{e \in p} w(e) = \delta(s, v)
 $$
-最小。
-
 ---
 
-## Scheme : Initialization and Relaxation
+## Scheme : Initialization + Relaxation
 
 在進行 Single Source Shortest Path 的計算前，通常會把圖初始化成下面那樣：
 
@@ -49,7 +47,7 @@ if v.d > u.d + w(u, v):
 
 ## Relaxation
 
-中文有翻譯稱作「鬆弛」，Relaxation 嚴格來說不是一種演算法，它是一個接下來的演算法中會用到的一個小步驟：
+中文有翻譯稱作「鬆弛」。嚴格來說不是一種演算法，它是一個接下來的演算法中會用到的一個小步驟：
 
 ```pseudocode
 RELAX (u, v, w):
@@ -190,20 +188,175 @@ $$
 $$
 p = \langle v_0, v_1, v_2 \dots v_k \rangle
 $$
-且：
+是條 $v_0 = s$ 到 $v_k$ 的一條最短路徑。定義對整條 $p$  `RELAX` 的順序： 
 $$
-w(p) = \delta(s, v_k)
+\mathtt{R} = \langle \mathtt{relax(v_i, v_{i + 1}, w):i = 0\dots k-1} \rangle
 $$
-定義 `RELAX` 的順序 $\mathtt{R} = \langle \mathtt{relax(v_i, v_{i + 1}, w):i = 0\dots k-1} \rangle$。
-
-若 $\mathtt{R}$ 是某個鬆弛順序 $\mathtt{S}$ 的子序列，則在所有 $\mathtt S$ 的鬆弛動作結束之後：
+則：若 $\mathtt{R}$ 是某個鬆弛順序 $\mathtt{S}$ 的子序列，則在所有 $\mathtt S$ 的鬆弛動作結束之後：
 $$
 v_k.d = \delta(s, v_k)
 $$
 
 ---
 
-把
+(Base Case)：`INITIALIZE(G, s)` 之後，未進行任何鬆弛步驟之前， $s.d = 0 = \delta(s, s)$，成立。
+
+(Inductive Step)：假設 $\mathtt{\left\langle RELAX(v_j, v_{j + 1}, w):j\in \langle1\dots i-1\rangle \right\rangle}$ 都依序執行過，且 $v_i.d = \delta(s, v_i)$。則：
+
+1. 在鬆弛完 $e_{i - 1} = (v_{i - 1}, v_{i})$，至鬆弛 $e_i = (v_i, v_{i + 1})$ 之前， $v_{i}.d = \delta(s, v_i)$，則之後不管經過多少次鬆弛，由 Upper-Bound Property 可知均保持 $v_{i}.d = \delta(s, v_i)$。
+
+2. 在對 $e_i = (v_i, v_{i + 1})$ 鬆弛時，因 $v_i.d = \delta(s, v_i)$，且由「最短路徑的子路徑也是最短路徑」知 $\langle v_0 ... v_{i + 1} \rangle$ 是一條由 $v_{0}$ 至 $v_{i + 1}$ 的最短路徑。
+
+	因此，由 Convergence Property 知：鬆弛之後 $v_{i + 1}.d = \delta(s, v_{i + 1})$。
+
+	由數學歸納法知原題成立。
+
+## Shortest Path Tree
+
+### Lemma (任意鬆弛後的 Predecessor Graph 是以 s 為根的樹)
+
+`INITIALIZE(G, s)` 後，並經過任意次的鬆馳之後，形成的 $G_{\pi}$ 必定是一棵以 $s$ 為根的樹。
+
+---
+
+(Base Case)：0 次鬆弛，這時候 $G_{\pi} = (\{s\}, \varnothing)$ 顯然是一棵樹。
+
+(Induction Step)：
+
+(Part 1：$s$ 和 $G_{\pi}$ 各點連通)
+
+鬆弛開始之前，$s \leadsto s$，顯然成立。
+
+假定 $n$ 次鬆弛之後，所有更新過 $d$ 值的點 $u$ ，都 $s\leadsto u$，並且在 `RELAX(u, v, w)` 的過程中，將對 $v.d$ 進行更新。
+
+( $v.d < \infty$)：則因 Upper-Bound Property 及 $\infty > v.d \geq \delta(s, v)$ ，知道 $s \leadsto v$。
+
+($v.d = \infty$)：由於 $\delta(s, u)\leq u.d < \infty$，因此 $s \leadsto u$。又此時正將 $v.\pi = u$，故 $(u,v) \in G_{\pi}$，
+
+(Part 2： $G_{\pi}$ 無環)：
+
+假定有環：
+$$
+c = \langle v_0 ... v_k \rangle\text{.   where }v_0 = v_k
+$$
+已知 $\forall v \in V_\pi.s \leadsto v$  ，因此 $c$ 中每一點均 reachable from $s$。
+
+Claim：若經過一連串鬆弛後，形成一個環 $c \subseteq G_\pi$，則 $c$ 必定是個負環：
+
+因為 $c = \langle v_0 \dots v_k \rangle \subseteq G_{\pi}$ ，依照鬆弛順序遞推 $v_{k-1}$ 的值：
+$$
+v_{k-1}.d = v_0.d + \sum_{i = 0}^{k-2}w(v_i, v_{i+1})
+$$
+因為鬆弛 $(v_{k-1}, v_k) = (v_{k-1}, v_0)$ 時，有更新 $v_{k}.d$，因此：
+$$
+v_{k-1}.d + w(v_{k-1}, v_k) < v_0.d
+$$
+即：
+$$
+v_0.d + \sum_{i = 0}^{k-1}w(v_i, v_{i+1}) < v_0.d
+$$
+但這表示：
+$$
+\sum_{i = 0}^{k-1}w(v_i, v_{i+1}) < 0
+$$
+加上 $v_k = v_0$，因此知道 $c$ 是個可以從 $s$ 到達的負環。矛盾。
+
+(Part 3：$\forall v \in V_\pi$，$s \leadsto v$ 的 simple path 唯一)
+
+假定經過某一個鬆弛順序之後，$v \in G_\pi$ 存在兩條相異的 simple path：
+$$
+\begin{align}
+p_1 = \langle s, v_1 \dots v_n,v \rangle \newline
+p_2 = \langle s, v_1',\dots v'_{n'}, v\rangle
+\end{align}
+$$
+WLOG，令 $n' \geq n$。因為 $\forall v \in V_\pi$，$v.\pi$ 唯一。因此：
+$$
+\begin{align}
+v.\pi = v_{n} = v_{n'}'\newline
+\end{align}
+$$
+由上式可繼續知道：
+$$
+v_n.\pi = v_{n-1} = v_{n' - 1}'.\pi = v_{n'-1}'
+$$
+繼續遞推，得到：
+$$
+\forall i \in \{ 0 \dots n-1\}.v_{n - i}.\pi = v_{n-i-1} = v_{n' - i - 1}'.\pi = v_{n'-i-1}'
+$$
+
+當 $i = n - 1$ 時：
+$$
+v_{1}.\pi = s = v_{n' - n}'.\pi = v_{n'-n -1}'
+$$
+若 $n' > n$，則由對 $p_2$ 的假設知 $s.\pi = v'_{n' - n - 1} \neq \mathtt{NIL}$，與 `INITIALIZE(G, s)` 後的結果矛盾。因此 $n' \leq n$。
+
+又，已知 $n' \geq n$，因此：
+$$
+n' = n
+$$
+故得證 $p_1 = p_2$。
+
+### Thm (Predecessor-Subgraph Property)
+
+假定在 `INITIALIZE(G, s)` ，並經過一連串 `RELAX` 後，$G$ 滿足：
+$$
+\forall v\in V(G).v.d = \delta(s, v)
+$$
+則 $G_\pi$ 是個 shortest path tree。
+
+---
+
+要證的三件事是：
+
+1. $V(G_{\pi}) $ 恰好是所有可從 $s$ 到達的點。
+2. $\forall v \in V(G_\pi).\exists! p.s\overset{p}{\leadsto}v$
+3. $\forall v \in V(G_\pi).\exists! p.s\overset{p}{\leadsto}v,w(p) = \delta(s, v)$
+
+(1. ) 由 `RELAX` 定義知：
+
+$$
+v.d < \infty \iff v.\pi \neq \mathtt{NIL} \quad \text(1)
+$$
+由最短路徑的定義知：
+$$
+\delta(s, v) < \infty \iff v \text{ is reachable from }s \quad (2)
+$$
+因此，由 Predecessor Graph 的定義，加上 $v.d = \delta(s, v)$ 的前提知：
+$$
+\begin{align}
+\forall v \in V_\pi\setminus \{s\}.v.\pi \neq \mathtt{NIL} &\Rightarrow v.d \underbrace{=}_{前提} \delta(s, v)  \underbrace{\leq}_{(1)} \infty \newline
+& \underbrace{\Rightarrow}_{(2)} v \text{ is reachable from }s
+\end{align}
+$$
+(2.) 上一個 Lemma 說 $G_\pi$ 是一棵以 $s$ 為根的樹，故由該 Lemma 直接得到 $s$ 和各點間的 simple path 唯一。
+
+(3.) 假定 $s \overset{p}{\leadsto}v_k$ 是 $G_\pi$ 中 由 $s$ 到 $v_k \in V(G_\pi)$ 的一個 simple path，且：
+$$
+p = \langle v_0, \dots ,v_k \rangle \text{  where $s = v_0$}
+$$
+因為 $p$ 中每邊都是鬆弛來的，所以：
+$$
+v._{i + 1}.d - v_i.d = w(v_i, v_{i + 1})
+$$
+但已知：
+$$
+\forall v_i \in V_\pi.\ v_i.d = \delta(s, v_i)
+$$
+因此：
+$$
+\forall i \in \{0\dots k-1\}.\delta(s, v_{i+1}) - \delta(s, v_i) = w(v_i, v_{i + 1})
+$$
+加總起來計算 $w(p)$：
+$$
+\begin{align}
+w(p) &= \sum_{i = 0}^{k-1}w(v_i, v_{i + 1})\newline
+&= \sum_{i = 0}^{k-1}\delta(s, v_{i+1}) - \delta(s, v_i)\newline
+&= \delta(s, v_k) - \delta(s, v_0) & (v_0 = s)\newline
+&= \delta(s, v_k)
+\end{align}
+$$
+由 (1.) (2.) (3.) 得證 $G_\pi$ 是 shortest path tree.
 
 ## Bellman-Ford Algorithm
 
