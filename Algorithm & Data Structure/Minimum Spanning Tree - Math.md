@@ -4,7 +4,7 @@
 
 #### 輸入
 
-一張圖 $G = (V, E)$，權重函數 $w：E \to \R$
+一張圖 $G = (V, E)$，權重函數 $w：E \to \mathbb R$
 
 #### 輸出
 
@@ -46,7 +46,7 @@ $$
 
 假定，$(S, V - S)$ 是 $G$ 的一個分割。若對於某一個邊的集合 $E$，$(S, V - S)$ 滿足：
 $$
-\neg\left(\exist (u, v) \in E.(u,v)\text{ crosses $(S, V-S)$}\right)
+\neg\left(\exists (u, v) \in E.(u,v)\text{ crosses $(S, V-S)$}\right)
 $$
 則稱 $(S, V - S)$ respects $E$。
 
@@ -72,9 +72,9 @@ $$
 
 ## Thm (合併 MST)
 
-$G = (V, E)$ 是一張無向圖，且 $G$ 連通。$w : E \to \R$ 是一個權重函數。若：
+$G = (V, E)$ 是一張無向圖，且 $G$ 連通。$w : E \to \mathbb R$ 是一個權重函數。若：
 $$
-\exist T',T'\text{ is a MST}.A \subseteq E\left(T'\right)
+\exists T',T'\text{ is a MST}.A \subseteq E\left(T'\right)
 $$
  且：
 $$
@@ -84,7 +84,7 @@ $$
 $$
 \begin{align}
 (u, v) & \text{ is a light edge crossing }(S, V - S) \newline 
-& \Rightarrow \exist T,T\text{ is a MST}.A \cup \{(u,v)\} \subseteq E(T)\newline
+& \Rightarrow \exists T,T\text{ is a MST}.A \cup \{(u,v)\} \subseteq E(T)\newline
 &
 \end{align}
 $$
@@ -143,7 +143,7 @@ $$
 \begin{cases}
 (u,v) \in T & (\text{T 的定義}) \newline
 A \subseteq T & (\text{上面 3. })
-\end{cases}\Rightarrow
+\end{cases} \quad \Rightarrow
 A\cup\{(u,v)\} \subseteq T
 $$
 由此得證。

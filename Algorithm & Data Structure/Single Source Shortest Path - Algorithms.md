@@ -128,3 +128,39 @@ $$
 $$
 與 $c$ 是負環的假設矛盾。因此一定在某個時刻會滿足 `if v.d > u.d + w(u,v)`，這時便執行 `return FALSE`。
 
+---
+
+## Dijkstra Algorithm
+
+做 BFS，不過是對以 $v.d$ 為 key 的 `Priority Queue` 做 BFS： 
+
+```pseudocode
+DIJKSTRA(G, w, s):
+INITIALIZE_SINGLE_SOURCE(G, s)
+S = {}
+Q = MIN_QUEUE(G.V)
+while !Q.EMPTY():
+	u = Q.EXTRACT_MIN()
+	S = SＵ{u}
+	for each v in G.Adj[u]:
+		RELAX(u, v, w)
+```
+
+### Claim 
+
+在執行過程中：
+$$
+\forall v \in S.\ \ v.d = \delta(s, v)
+$$
+
+---
+
+(INITIALIZE) ：$s.d = 0 = \delta(s, s)$，顯然成立。
+
+(MAITENANCE)：假定存在某一個時刻：
+
+1. $u \in S$，但 $u.d \neq \delta(s, u)$。
+2. 由於 $s.d = \delta(s, s)$ 一開始就對，所以 $u \neq s$
+3. 由於 $u\neq s$，因此在把 $u$ 加入 $s$ 之前， $S \neq \varnothing$。因為至少有 $s$。
+4. 再由 $u.d \neq \delta(s, u)$ 可以知道 $s \leadsto u$，否則由 No-Path Property，無論怎麼鬆弛， $u.d = \delta(s, u) = \infty$。
+5. 因為 $s \leadsto u$，所以 $s, u$ 間必定存在最短路徑 $p$

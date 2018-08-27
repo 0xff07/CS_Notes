@@ -87,24 +87,24 @@ $$
 
 $G = (V, E)$ 是一張有向圖，$C', C$ 是 $G$ 相異的 SCC。假定 $v \in C$，$v' \in C'$，且 $(v, v') \in E$，則：
 $$
-f(C) > f(C')
+f( C ) > f(C')
 $$
 
 ---
 
-假定 $d(C) < d(C')$，令 $x \in C$ 是 $C$ 中第一個被發現的點。在 $x.d$ 時間時，$C, C'$ 全白。對於任意 $w' \in C'$：
+假定 $d( C ) < d(C')$，令 $x \in C$ 是 $C$ 中第一個被發現的點。在 $x.d$ 時間時，$C, C'$ 全白。對於任意 $w' \in C'$：
 $$
 x \leadsto v \to v' \leadsto w
 $$
 是一條全白路徑。因此 $C$ 中所有點都是 $x$ 的子節點。由 Nestings 得證。
 
-假定 $d(C) > d(C')$，假定 $x'$ 是 $C'$ 中第一個發現的點。因 $d(C) > d(C')$，故在 $x'.d$ 時， $C$ 為全白。由 Lemma 知 ：
+假定 $d( C ) > d(C')$，假定 $x'$ 是 $C'$ 中第一個發現的點。因 $d( C ) > d(C')$，故在 $x'.d$ 時， $C$ 為全白。由 Lemma 知 ：
 $$
 \neg \exists u \in C,u' \in C'.(u',u) \in E
 $$
 所以在 $x'.d$ 時：
 $$
-\forall w \in C. x' \cancel{\xrightarrow{\mathtt{WHITE}}} w
+\forall w \in C. x' \require{cancel}\cancel{\xrightarrow{\mathtt{WHITE}}} w
 $$
 因此 $C$ 中任意點，都不是 $x'$ 的子節點。由 Nestings 的狀況 1. 知 $C$ 中每一點的 $f$ 值都比 $C'$ 中每一點的 $f$ 值大。由此得證。
 
@@ -118,7 +118,7 @@ $$
 
 $G = (V, E)$ 是一張有向圖，$C', C$ 是 $G$ 相異的 SCC。假定 $v \in C$，$v' \in C'$，且 $(v', v) \in E^T$，則:
 $$
-f(C) > f(C')
+f( C ) > f(C')
 $$
 
 ---
