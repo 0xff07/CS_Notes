@@ -1,4 +1,4 @@
-# Single Source Shortest Path - Algorithm
+# Single Source Shortest Path - Algorithm 1
 
 ## Problem (Single Source Shortest Path)
 
@@ -16,17 +16,32 @@ $$
 
 ## Scheme : Initialization + Relaxation
 
+這邊所有的演算法都是建立在這樣的架構之下：
+
+1. 進行初始化：`INITIALIZE_SINGLE_SOURCE(G, s)`
+2. 對圖中的邊進行一連串的「鬆弛」來更新最短距離：`RELAX(u, v, w)`
+
+`RELAX` 這個動作會有一些性質，可以幫助我們設計出可以求出最短距離的各種演算法。
+
+### Initialization 
+
 在進行 Single Source Shortest Path 的計算前，通常會把圖初始化成下面那樣：
 
 ```pseudocode
-INITIALIZE(G, S):
+INITIALIZE_SINGLE_SOURCE(G, S):
 	for v in V:
 		v.d <- INFINITY
 		v.pi <- NIL
 	s.d <- 0
 ```
 
-接著用特定順序「更新」到每個點的最短距離。這個步驟叫做「鬆弛」：
+出發點自己到自己的最短距離是 0，而在所有動作開始前，假設出發點 $s$ 到所有點的最短距離是 $\infty$。
+
+接下來只要有發現更短的距離與路徑，就把資訊更新。這個「更新」的步驟，稱作 `RELAX`。
+
+### Relaxation
+
+`INITIALIZE_SINGLE_SOURCE` 之後，接著會用特定順序「更新」到每個點的最短距離。這個步驟叫做「鬆弛」：
 
 ```
 RELAX (u, v, w):
@@ -35,30 +50,15 @@ if v.d > u.d + w(u, v):
 	v.pi <- u
 ```
 
-要用什麼順序進行鬆弛？這就是要設計的地方。後面設計的演算法中，其實只是在初始化之後，用某個特定的「鬆弛順序」依序更新到每個點的最短路徑，並且說明這個順序是正確的。
+白話文是：如果發現先走到 $u$ 點，再 $(u,v)$ 邊，長度比原來的路徑短，那就把最短路徑換成這條。注意吃的參數是一條邊，所以 `RELAX` 的對象是某條邊。
+
+至於要用什麼順序進行鬆弛，才能用最少步找出最短距離？這就是要設計的地方。後面設計的演算法中，其實只是在初始化之後，用某個特定的「鬆弛順序」依序更新到每個點的最短路徑，並且說明這個順序是正確的。
 
 一些對於鬆弛的「順序」粗略的想法包含：
 
 1. 暴力鬆弛整張圖到不能再鬆弛，畢竟最短路徑最多也只有 $|V|$ 個點。
 2. 有 Optimal Substructure，所以可以期待有某種像 DP 的方式可以找到最短路徑。
 3. 如果更進一步這張圖還是個 DAG，那填表順序應該可以更簡化。
-
----
-
-## Relaxation
-
-中文有翻譯稱作「鬆弛」。嚴格來說不是一種演算法，它是一個接下來的演算法中會用到的一個小步驟：
-
-```pseudocode
-RELAX (u, v, w):
-if v.d > u.d + w(u, v):
-	v.d <- u.d + w.d
-	v.pi <- u
-```
-
-白話文是：如果發現先走到 $u$ 點，再 $(u,v)$ 邊，長度比原來的路徑短，那就把最短路徑換成這條。
-
-注意吃的參數是一條邊，所以 `RELAX` 的對象是某條邊。
 
 ---
 
@@ -78,9 +78,13 @@ $$
 
 ---
 
+## Effects of Relaxations
+
+在進行 `INITIALIZE_SINGLE_SOUTCE(G, s)` ，接著進行一連串 `RELAX` 的過程中，圖中各點的資料會神奇地保持一些性質。這些性質可以幫助理解最短路徑的演算法是怎麼設計的。
+
 ### Thm (Upper-Bound Property)
 
-1. $G$ 經過初始化之後，無論程式對任意點執行多少次 `RELAX`，以下性質必定成立 ：
+1. $G$ 經過 `INITIALIZE_SINGLE_SOUTCE(G, s)`之後，無論程式對任意點執行多少次 `RELAX`，必定滿足 ：
 
 $$
 \begin{align}
@@ -95,11 +99,13 @@ $$
 	則在這之後，$v.d$ 的值都不會變（不管之後做了多少次 `RELAX`）。
 ---
 
+這個道理跟 BFS 時一樣，$V.d$ 有限表示有可以從 $s$ 出發走到 $v$ 的路徑，而任意路徑的權重都不應該比最短路徑的權重小。聽起來合理，但程式有沒有符合這件事呢？
+
 對鬆弛次數 $n$ 歸納。 
 
-$n = 0$：初始化後 $\forall v \in V.\ \ v.d = \infty \geq \delta(s, v)$ 顯然成立。
+($n = 0$)：初始化後 $\forall v \in V.\ \ v.d = \infty \geq \delta(s, v)$ 顯然成立。
 
-$n > 0$：假設第 $n - 1$ 次鬆弛時，這件事對所有點仍然成立。若第 $n$ 次鬆弛發生在 $v \in V$：
+($n > 0$)：假設第 $n - 1$ 次鬆弛時，這件事對所有點仍然成立。若第 $n$ 次鬆弛發生在 $v \in V$：
 
 1. 如果沒有更動 $v.d$ 的值：直接由歸納法假設說原性質成立。因此如果 $v.d == \delta(s,v)$，由三角不等式：
 	$$
@@ -120,6 +126,7 @@ $n > 0$：假設第 $n - 1$ 次鬆弛時，這件事對所有點仍然成立。�
 
 #### Corollary (No-Path Property)
 
+「起點到不了的點，最短距離是 $\infty$」：
 $$
 \neg (\exists p.s \overset{p}{\leadsto}v) \Rightarrow v.d = \delta(s,v) = \infty
 $$
@@ -198,6 +205,8 @@ v_k.d = \delta(s, v_k)
 $$
 
 ---
+
+鬆弛只要「照順序集滿」某條最短路徑的所有邊，就一定會把 $d$ 值更新成最短路徑。
 
 (Base Case)：`INITIALIZE(G, s)` 之後，未進行任何鬆弛步驟之前， $s.d = 0 = \delta(s, s)$，成立。
 
@@ -357,20 +366,4 @@ w(p) &= \sum_{i = 0}^{k-1}w(v_i, v_{i + 1})\newline
 \end{align}
 $$
 由 (1.) (2.) (3.) 得證 $G_\pi$ 是 shortest path tree.
-
-## Bellman-Ford Algorithm
-
-```pseudocode
-BELLMAN_FORD(G)
-INITIALIZE(G) // 把 d 都設成無限
-for i in 1 ... |V|-1:
-	for (u,v) in E:
-		if u.d + w(u,v) > v.d
-			v.d = u.d + w(u,v)
-			v.pi = u
-```
-
-直觀來說：
-
-最長的最短路徑也只有 $|V|$ 個點，所以暴力把全部邊 `RELAX` $|V| - 1$ 次之後，就沒更長的路徑能 `RELAX` 了。只有一種狀況例外：圖有負環。所以如果發現再 `RELAX`  1 次時，還有點的值被更動，就知道有負環。
 
