@@ -45,27 +45,27 @@ $$
 
 ## Def (Flow Network)
 
-網路流 (flow network) 由一張有向圖 $G = (V, E)$，以及一個容量函數 $c$ 組成。其中：
+網路流 (flow network) 有向圖 $G = (V, E)$，以及一個容量函數 $c$ 組成。其中：
 
-1. $G$  滿足：
+$G$ 滿足：
 $$
-  \begin{cases}
-    (u, v) \in E \Rightarrow (v, u) \not \in E \newline
-    \forall v \in V.(v, v) \not\in E & \text{(no self-loop)} 
+\begin{cases}
+    (u, v) \in E \Rightarrow (v, u) \not \in E & (\text{no parallel edges})\newline 
+    \forall v \in V.(v, v) \not\in E & \text{(no self-loop)} \newline
     \end{cases}
 $$
-  且存在一個「源點」 $s$ 與一個匯點 $t$，滿足：
+且存在一個「源點」 $s$ 與一個匯點 $t$，滿足：
 $$
-  \exists s, t.\forall v \in V.s\leadsto v\leadsto t
+\exists s, t.\forall v \in V.s\leadsto v\leadsto t
 $$
 
-2. $c$ 滿足：
+$c$ 滿足：
 $$
-  c:V \times V \to \mathbb R^+ \cup \{0\}
+c:V \times V \to \mathbb R^+ \cup \{0\}
 $$
-  且：
+ 且：
 $$
-  c(u, v)  \begin{cases}
+c(u, v)  \begin{cases}
     \geq 0 & \text{if $(u,v) \in E$} \newline
     =0 & \text{if $(u,v)\not \in E$}
     \end{cases}
@@ -165,13 +165,61 @@ $$
 
 ---
 
-把一個流跟一個殘流網路的流合併成一個流。
+### Observation
+
+$$
+(f \uparrow f') \text{ is a flow in }G
+$$
+
+---
+
+(Capacity Constrain)對於任一邊 $(u, v) \in E$：
+$$
+\begin{align}
+&\begin{cases}
+0 \leq f(u, v) \leq c(u, v) & \quad (1)\newline
+0\leq f'(u, v) \leq c_f(u, v) = c(u, v) - f(u, v) & \quad(2)\newline
+0\leq f'(v, u) \leq c_f(v, u) = f(u, v) & \quad(3)
+\end{cases}\newline\newline
+
+\Rightarrow &  f'(u, v) + f(u, v) \leq c(u, v) & \text{by (1), (2)}\newline
+\Rightarrow & f'(u, v) + f(u,v) - f'(v, u) \leq c(u,v) - f'(v, u) \leq c(u,v) & \text{左右同減 $f'(v, u)$}
+\end{align}
+$$
+另一方面：
+$$
+\begin{align}
+f'(v, u) \leq f(u, v) & \Rightarrow\  0\leq f(u, v) - f'(v, u) &\text{(3)} \newline
+&\Rightarrow\  f'(u,v)\leq f(u, v) - f'(v, u) + f'(u, v) & \text{(左右同加 $f'(u,v)$)}\newline
+&\Rightarrow\ 0\leq f(u, v) - f'(v, u) + f'(u, v) & \text{($f'(u,v)\geq 0$)}
+\end{align}
+$$
+因滿足容量限制。
+
+(Flow Conservation)對於任意 $v \in V$。由定義知 $f$ 與 $f'$ 都滿足 Flow Conservation。因此對於任意 $u \in V \setminus\{s, t\}$：
+$$
+\begin{align}
+\sum_{v \in V}(f \uparrow f')(u, v) &= \sum_{v\in V}\left(f(u,v) + f'(u,v) - f'(v,u)\right) & \text{(定義)}\newline
+&= \sum_{v\in V}f(u,v) + \sum_{v\in V}f'(u,v) - \sum_{v\in V}f'(v,u) &\text{(爆開)}\newline
+&= \sum_{v\in V}f(v,u) + \sum_{v\in V}f'(v,u) - \sum_{v\in V}f'(u,v) & \text{(Flow Cons. of $f, f'$)}\newline
+&= \sum_{v\in V}f(v,u) + f'(v,u) - f'(u,v) \newline
+&=\sum_{v \in V}(f \uparrow f')(v, u)
+\end{align}
+$$
 
 ### Lemma
 
 $$
 |f \uparrow f'| = |f| + |f'|
 $$
+
+---
+
+因為 $G$ 無重邊，因此 
+$$
+
+$$
+
 
 ## Def (Augmenting Path)
 
@@ -222,7 +270,7 @@ $$
 
 ## Def (Cut)
 
-若 $G = (V, E)$ 是個網路流， 一個 $G$ 的分割是一對集合的 pair $(S, T)$，並且滿足 ：
+若 $G = (V, E)$ 是個網路流， 一個 $G$ 的分割 $C$ 是一對集合的 pair $C = (S, T)$，並且滿足 ：
 $$
 \begin{cases}
 s \in S \subseteq V & \text{and}\newline
@@ -232,26 +280,33 @@ $$
 
 ---
 
+### Def (Cut-Set)
+
+假定 $C = (S, T)$ 是一個網路流 $G$ 的分割，則 $C$ 的 cut-set 定義為：
+$$
+X_C = \{(u, v)\mid (u, v) \in E, u \in S, v \in T, \} = (S \times T)\cap E
+$$
+
 ### Def (Net Flow between Cut)
 
-若 $G$ 是一個網路流，  $(S, T)$ 是一個 $G$ 的分割。則分割 $(S, T)$ 之間的「淨流」定義為：
+若 $G$ 是一個網路流，  $C = (S, T)$ 是一個 $G$ 的分割。則分割 $(S, T)$ 之間的「淨流」定義為：
 $$
-f(S, T) = \sum_{u \in S}\sum_{v \in T} f(u, v) - \sum_{u \in S}\sum_{v \in T} f(v, u)
+f(S, T) = \sum_{(u, v) \in X_C} f(u, v) - \sum_{(u, v) \in X_c} f(v, u)
 $$
 
 ---
 
 ### Def (Minimum Cut)
 
-若一個 網路流 $G$ 的分割 $(S_m, T_m)$ 是所有分割中， $f(S_m, T_m)$ 最小的。則稱 $(S_m, T_m)$ 是一過 minimum cut。
+若一個 網路流 $G$ 的分割 $(S_m, T_m)$ 是所有分割中，使 $f(S_m, T_m)$ 最小的。則稱 $(S_m, T_m)$ 是一過 minimum cut。
 
 ---
 
 ### Def (Capacity of Cut)
 
-若 $G$ 是一個網路流，  $(S, T)$ 是一個 $G$ 的分割。則分割 $(S, T)$ 之間的「容量」定義為：
+若 $G$ 是一個網路流，  $C = (S, T)$ 是一個 $G$ 的分割。則分割 $(S, T)$ 之間的「容量」定義為：
 $$
-c(S, T) = \sum_{u \in S} \sum_{v\in T}c(u, v)
+c(S, T) = \sum_{(u, v \in X_C)}c(u, v)
 $$
 
 ---
@@ -266,6 +321,8 @@ $$
 $$
 
 ---
+
+
 
 ### Corollary 
 
