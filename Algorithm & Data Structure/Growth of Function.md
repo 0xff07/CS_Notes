@@ -124,26 +124,32 @@ $$
 ### Remark 
 
 1. 這個定義等價於：
-	$$
-	\lim_{n \to \infty} \frac {f(n)}{g(n)} = 0
-	$$
-	證明方式很簡單，$\forall c_2 = \epsilon > 0$，有：
-	$$
-	f(n) < c_2 g(n) \iff \frac {f(n)}{g(n)} < c_2 = \epsilon
-	$$
+  $$
+  \lim_{n \to \infty} \frac {f(n)}{g(n)} = 0
+  $$
+  證明方式很簡單，$\forall c_2 = \epsilon > 0$，有：
+  $$
+  f(n) < c_2 g(n) \iff \frac {f(n)}{g(n)} < c_2 = \epsilon
+  $$
 
-	 	因此：
+   	因此：
 
-	$$
-	\begin{align}
-	    & f(n) = o(g(n))  \newline
-	  	\newline
-	  	&\iff \forall c_2, \exists n_0 > 0.\forall n \geq n_0. f(n)< c_2 g(n)  \newline
-	   &\iff \forall c_2, \exists n_0 > 0.\forall n \geq n_0. \frac {f(n)}{g(n)} < c_2 := \epsilon \newline
-	   &\iff \lim_{n\to \infty}\frac {f(n)}{g(n)} = 0
-	  	\end{align}
-	$$
+  $$
+  \begin{align}
+      & f(n) = o(g(n))  \newline
+    	\newline
+    	&\iff \forall c_2, \exists n_0 > 0.\forall n \geq n_0. f(n)< c_2 g(n)  \newline
+     &\iff \forall c_2, \exists n_0 > 0.\forall n \geq n_0. \frac {f(n)}{g(n)} < c_2 := \epsilon \newline
+     &\iff \lim_{n\to \infty}\frac {f(n)}{g(n)} = 0
+    	\end{align}
+  $$
 
+
+2. 如果要證明「不屬於」，就要證明任意 $c, n_0$ 都不能使定義成立，或是矛盾政法如：
+   $$
+   n^3 \not \in O(n^2)
+   $$
+   反證：假定 $n^3 \in O(n^2) \Rightarrow \exists c, n_0.\forall n > n_0.n^3 \leq cn^2$。但顯然對於任意 $c, n_0$，當 $n > n' = max\{n_0, c\}$ 時，$n^3 = n'^2\cdot n' \geq n'^2 \cdot c$ ，矛盾。 
 
 
 
@@ -467,10 +473,11 @@ $$
         		\end{cases}
       	$$
           則可使：
-        	
+        ​	
       $$
         \forall n > n_0.c_1 n^k \leq f(n) \leq c_2 n^k
       $$
+
 
 
 

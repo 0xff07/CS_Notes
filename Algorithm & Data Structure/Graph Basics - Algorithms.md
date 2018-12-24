@@ -15,7 +15,28 @@ w_{ij} =
 0 & \mathtt{otherwise}
 \end{cases}}
 $$
-實作上來說像是：
+舉例來說：
+
+```mermaid
+graph LR
+A[v1] --- B[v2]
+B[v2] --- C[v3]
+C[v3] --- C[v3]
+D[v4]
+```
+
+可以用：
+$$
+\begin{bmatrix}
+0 & 1 & 0 & 0 \newline
+1 & 0 & 1 & 0 \newline
+0 & 1 & 1 & 0 \newline
+0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+
+表示。實作上來說像是：
 
 ```C
 #define N_MAX 20
@@ -263,19 +284,19 @@ $$
 
 ### Def (Classification of Edges)
 
-1. Tree Edge : 
+1. ==Tree Edge== : 
 
 	$u, v \in V$。若 $v$ 是在 DFS 時，探索 $e = (u, v) \in E$ 時被發現，則稱 $e$ 為 tree edge。
 
-2. Back Edge：
+2. ==Back Edge==：
 
 	$u, v \in V$。若在 DFS 時，$u$ 是 $v$ 的父節點，且 $e = (v, u) \in E$，則稱 $e$ 為 back edge。
 
-3. Forward Edge:
+3. ==Forward Edge==:
 
 	$u, v \in V$。若在 DFS 時，$u$ 是 $v$ 的父節點，且 $e = (u, v) \in E$，但 $e \not \in E_{\pi}$，則稱 $e$ 為 forward edge。
 
-4. Cross Edge:
+4. ==Cross Edge==:
 
 	不是 Tree Edge, 不是 Back Edge, 不是 Forward Edge 的邊。比如說連接兩顆 DFS Tree 的邊。
 
@@ -412,7 +433,6 @@ $$
 1. 假定 $s\ u\mathrm{\ not\ reachable}$，則 $\delta(s, u) = \infty$，命題成立。
 2. 假定 $s\ u\mathrm{\ reachable}$，則存在一條長度 $\delta(s, u)$ 的最短路徑 $p' = \langle s...u \rangle$，則路徑 $p = p' \cup \{v\}$ 是一條 $u, v$ 間的路徑（未必是最短），長度為 $\delta(s, u) + 1$。因為任何路徑長度都 $\leq$ 最短路徑長度，故：
 
-  
 
 $$
   \delta(s, v) \leq \delta(s, u) + 1

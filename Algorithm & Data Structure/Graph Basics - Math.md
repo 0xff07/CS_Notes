@@ -1,6 +1,6 @@
 # Data Structure : Graph Basics
 
-### Def (Graph)
+# Def (Graph)
 
 一個圖 (Graph)  $G = (V, E)$  由兩個部分組成：
 
@@ -17,7 +17,7 @@
 
 ---
 
-### Def (Incident)
+# Def (Incident)
 
 1. 若 $G = (V, E)$ 是有向圖，且 $(u, v) \in E$，則稱 $(u, v)$ 「incident from / leaves u」，且「incident to / enters v」。
 2.  若 $G = (V, E)$ 是無向圖，且 $(u, v) \in E$，則稱 $(u, v)$ 「incident on u and v」。
@@ -30,59 +30,48 @@
 
 ---
 
-### Def (Degree)
+# Def (Degree)
 
 1. 若 $G = (V, E)$ 是個有向圖，$u \in V$, 則：
 
-         
 
      1. In-degree of $u$：進入 $u$ 的邊數。
 
-       
 
      $$
        d_{u, i} = |\{(i, u)| (i, u) \in E\}|
      $$
 
-       
 
      2. Out-degree of $u$：從 $u$ 出發的邊數。
 
-       
 
      $$
             	d_{u, o} = |\{(u, i)| (u, i) \in E\}|
      $$
 
-       
 
      3. Degree of u：$u$ 的 in-degree 加 out-degree。
-
-     	
+    
      	$$
      	\deg(u) = d_{u, i} + d_{u, o}
      	$$
-     	
+
 
 
 
 
 2. 若 $G = (V, E)$ 是個無向圖，且 $u\in V$，則： 
+    1. Degree of $u​$：
 
-     
-
-    1. Degree of $u$：
-
-      
 
     $$
       \deg(u) = |\{(u, i) | (u, i) \in E\}|
     $$
-    
 
 ---
 
-### Thm (Hand-Shaking Lemma)
+# Thm (Hand-Shaking Lemma)
 
 假定 $G = (V, E)$ 是個無向圖，則：
 
@@ -92,11 +81,22 @@ $$
 
 ---
 
+因為無向圖的 adjacency matrix 對稱，由此得證。
+
 用邊來計數 Degree 的數目即得。
+
+歸納法：
+
+1. 圖為空，顯然成立
+2. 假定一張圖 $G = (V, E)$  滿足 hand-shaking lemma，則任意增加一個邊， deg 增加 2，因此仍然為偶數。
+
+## Corollary
+
+degree 為奇數的節點一定有偶數個
 
 ---
 
-### Def (Path)
+# Def (Path)
 
 一個從 $u$ 到 $u'$，長度為 $k$ $\geq 0$ 的 path,  $p$, 定義為一個由 $V$ 中的元素形成的序列：
 $$
@@ -124,7 +124,7 @@ $$
 
 ---
 
-#### Def (Simple) 
+## Def (Simple) 
 
 若 $u \overset{p}{\leadsto} u'$，且 $p$ 的長度為 $k$。若 $p$ 中沒有重複經過的點，即：
 $$
@@ -133,7 +133,7 @@ $$
 
 ---
 
-#### Def (Cycle) 
+## Def (Cycle) 
 
 若 $u \overset{p}{\leadsto} u'$，且：
 
@@ -145,7 +145,7 @@ $$
 
 ---
 
-### Def (Reachable) 
+# Def (Reachable) 
 
 $G = (V, E)$ 是一張圖。若 $u, v \in V$ ，且：
 
@@ -161,7 +161,7 @@ $$
 
 ---
 
-### Def (Connected) 
+# Def (Connected) 
 
 $G = (V, E)$ 是一張圖。假定：
 
@@ -173,7 +173,7 @@ $$
 
 ---
 
-### Def (Cyclic Graph) 
+# Def (Cyclic Graph) 
 
 $G = (V, E)$ 。假定：
 
@@ -185,7 +185,7 @@ $$
 
 ---
 
-### Thm : 無向圖有 Path ⇒ 有 Simple Path
+# Thm : 無向圖有 Path ⇒ 有 Simple Path
 
 $G = (V, E)$ 是個無向圖。則：
 $$
@@ -215,7 +215,7 @@ $$
 
 ---
 
-### Thm：Undirected, Connected ⇒ |E|  ≥ |V| - 1
+# Thm：Undirected, Connected ⇒ |E|  ≥ |V| - 1
 
 1. |V| = 1 原題顯然成立。
 
@@ -230,3 +230,23 @@ $$
 $$
 3. 由數學歸納法知原題成立。
 
+# Def (Isomorphism of Graphs)
+
+假定 $G_1 = (V_1, E_1)$，$G_2 = (V_2, E_2)$。若：
+$$
+\exists f : V_1 \to V_2,f\text{ bijective}.\forall\{u,v\}\subseteq V.\{u,v\} \in E \iff\{f(u), f(v)\} \in E_2
+$$
+
+## Def (Graph Invariant)
+
+ properties preserved by isomorphism：
+
+1. 節點數目
+2. 邊的數目
+3. 最大/最小的 degree
+4. degree sequence
+5. length of simple cycles
+6. Connectivity
+7. Euler/Hamiltonian Path
+8. Planarity
+9. Coloring
