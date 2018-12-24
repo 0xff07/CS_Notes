@@ -6,6 +6,8 @@
 
 # Data Level Parallelism
 
+Data Level Parallelism 思考的點在於「資料的相依性」。如果不同資料之間的計算沒有相依性，那麼就可以考慮把這些沒有相依性的資料運算同時處理。比如說加兩個矩陣，相應位置的每個元素的加法，並不仰賴於其他元素加法的結果。這時就可以考慮如「在 1 個 cycle 中，同時進行 8 個加法」這種方式來加速程式。
+
 ## SIMD
 
 >Vector architectures grab sets of data elements scattered about memory, place them into large, sequential register files, operate on data in those register files, and then disperse the results back into memory.
@@ -13,9 +15,8 @@
 這個意思是 Single-Instruction Multiple Data。字面上的意思是「用單一一個指令，一次處理很多資料」。比如說如果要把 `float M[256]` 中的內容加到 `float N[256]` 當中。如果是使用一般的作法，最直覺的方法可能會寫出像下面這樣的東西：
 
 ```c
-for (int i = 0; i < 256; i++) {
-	N[i] += M;
-}
+for (int i = 0; i < 256; i++)
+	N[i] += M[i];
 ```
 
 但在做這件事情的時候會發現：既然都已經知道要加 256 個東西了，那可不可以不要一個一個加，而是一批一批的加，比如說 4 個 4 個加、8 個 8 個加．．．？有點像是：
@@ -53,18 +54,18 @@ for (int i = 0; i < 32; i++) {
 
 但這時有一個問題：要怎麼知道這些指令真的有比較快呢？首先，可以去查處理器廠商給的資料，比如 Intel 的 [Intel Intrinsic Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)。分別查 `_mm256_loadu_ps` 為例，可以查到下面的內容：
 
-> # Synopsis
+> ### Synopsis
 >
 > `__m256 _mm256_add_ps (__m256 a, __m256 b)`
 > `#include <immintrin.h>`
 > Instruction: `vaddps ymm, ymm, ymm`
 > CPUID Flags: `AVX`
 >
-> # Description
+> ### Description
 >
 > Add packed single-precision (32-bit) floating-point elements in a and b, and store the results in dst.
 >
-> # Operation
+> ### Operation
 >
 > ```
 > FOR j := 0 to 7
@@ -92,7 +93,9 @@ for (int i = 0; i < 32; i++) {
 >
 > Throughput is the number of processor clocks it takes for an instruction to execute or perform its calculations. An instruction with a throughput of 2 clocks would tie up its execution unit for that many cycles which prevents an instruction needing that execution unit from being executed. Only after the instruction is done with the execution unit can the next instruction enter.
 
-若查詢[Intel 指令的性能實驗值](https://www.agner.org/optimize/instruction_tables.pdf)可以發現，以 Skylake 為例，浮點數加法 `ADDSS` 指令的 Latency 也是 4，throughput 也是 0.5，但這只是「加一個浮點數」需要的時間而已！舉例來說，像下面這種個程式：
+若查詢[Intel 指令的性能實驗值](https://www.agner.org/optimize/instruction_tables.pdf)可以發現，以 Skylake 為例，浮點數加法 `ADDSS` 指令的 Latency 也是 4，throughput 也是 0.5，但這只是「加一個浮點數」需要的時間而已，而 `VADDPS` 指令一次可以加 8 個浮點數。
+
+舉例來說，像下面這種個程式：
 
 ```c
 float a[8] = {2.125, 2.125, 2.125, 2.125, 2.125, 2.125, 2.125, 2.125}, 
@@ -155,7 +158,7 @@ int main()
     112c:       00
     112d:       c5 f4 58 05 eb 2e 00    vaddps 0x2eeb(%rip),%ymm1,%ymm0        # 4020 <b>
     1134:       00
-    1135:       c5 f8 29 05 43 2f 00    vmovaps %xmm0,0x2f43(%rip)        # 4080 <c>
+    1135:       c5 f8 29 05 43 2f 00    vmovaps %xmm0,0x2f43(%rip)        	# 4080 <c>
     113c:       00
     113d:       c4 e3 7d 19 05 49 2f    vextractf128 $0x1,%ymm0,0x2f49(%rip)        # 4090 <c+0x10>
     1144:       00 00 01
@@ -166,7 +169,7 @@ int main()
 
 可以發現：程式當中明顯沒有迴圈出現，取而代之的是 `vmovaps` 指令一次，把整個 `a`跟 `b` 塞分別進去 `ymm0` 跟 `ymm1` 暫存器中，然後將兩個暫存器一次相加，最後把東西塞向 `c` 裡面。
 
-這樣看起來，向量運算應該要超級快嗎？實際上未必。比如說上述這個程式來說，有沒有使用 AVX 其實沒有顯著的差異，使用 `perf` 統計起來，甚至無法分辨這個誤差屬於統計上的誤差，或是真的有優化。但是如果換一個程式，就有非常明顯的差異。舉例來說，考慮一個矩陣加法的程式：
+這樣看起來，向量運算應該要超級快嗎？實際上未必。比如說上述這個程式來說，有沒有使用 AVX 其實沒有顯著的差異，使用 `perf` 統計起來，甚至無法分辨這個誤差屬於統計上的誤差，或是真的由此推論是 AVX 帶來優化。但是如果換一個程式，就有非常明顯的差異。舉例來說，考慮一個矩陣加法的程式。一個直覺的實作方式是：
 
 ```c
 float a[8192][8192];
@@ -211,7 +214,7 @@ int main()
 
 ```
 
-這個程式明顯是用 `%rdi` 暫存器當成 `i`，`%rax` 當成 `j`，執行兩層迴圈（跟上一個例子類似，只是變成兩曾）。而用 `AVX` 寫的程式如下：
+這個程式使用用 `%rdi` 暫存器當成 `i`，`%rax` 當成 `j`，執行兩層迴圈（跟上一個例子類似，只是變成兩曾）。而用 `AVX` 寫的程式如下：
 
 ```c
 # include <immintrin.h>
@@ -262,33 +265,15 @@ int main()
     118f:       90                      nop
 ```
 
-一樣是兩層回圈，只是本來的 `movss`, `addss` 換成了向量運算的 `vmovaps`, `vaddps` 指令。若使用 perf 對編譯出來的結果進行效能測試：
+一樣是兩層回圈，只是本來的 `movss`, `addss` 換成了向量運算的 `vmovaps`, `vaddps` 指令。根據官方的說明，可能會預期在 load/store 的時間可以變成原先的 1/8 倍左右。若使用 perf 對編譯出來的結果進行效能測試：
 
 ```shell
-$ perf stat -r 10 -d ./matrix_avx; perf stat -r 10 -d ./matrix_naive;
+$ perf perf stat -r 10 -d ./matrix_naive; stat -r 10 -d ./matrix_avx;
 ```
 
 會得到：
 
 ```shell
- Performance counter stats for './matrix_avx' (10 runs):
-
-         41.280908      task-clock (msec)         #    0.995 CPUs utilized            ( +-  1.39% )
-                 0      context-switches          #    0.002 K/sec                    ( +-100.00% )
-                 0      cpu-migrations            #    0.000 K/sec                  
-            49,201      page-faults               #    1.192 M/sec                    ( +-  0.00% )
-       133,717,861      cycles                    #    3.239 GHz                      ( +-  0.88% )  (44.22%)
-        86,337,819      instructions              #    0.65  insn per cycle           ( +-  1.61% )  (63.60%)
-        17,418,854      branches                  #  421.959 M/sec                    ( +-  1.32% )  (69.98%)
-            66,559      branch-misses             #    0.38% of all branches          ( +-  0.97% )  (70.94%)
-        30,976,393      L1-dcache-loads           #  750.381 M/sec                    ( +-  0.58% )  (46.10%)
-         1,449,312      L1-dcache-load-misses     #    4.68% of all L1-dcache hits    ( +-  1.25% )  (19.37%)
-            44,650      LLC-loads                 #    1.082 M/sec                    ( +-  1.70% )  (19.37%)
-            17,809      LLC-load-misses           #   39.89% of all LL-cache hits     ( +- 10.48% )  (29.06%)
-
-          0.041499 +- 0.000581 seconds time elapsed  ( +-  1.40% )
-
-
  Performance counter stats for './matrix_naive' (10 runs):
 
         171.325308      task-clock (msec)         #    0.999 CPUs utilized            ( +-  0.23% )
@@ -306,13 +291,34 @@ $ perf stat -r 10 -d ./matrix_avx; perf stat -r 10 -d ./matrix_naive;
 
           0.171542 +- 0.000401 seconds time elapsed  ( +-  0.23% )
 
+ Performance counter stats for './matrix_avx' (10 runs):
+
+         41.280908      task-clock (msec)         #    0.995 CPUs utilized            ( +-  1.39% )
+                 0      context-switches          #    0.002 K/sec                    ( +-100.00% )
+                 0      cpu-migrations            #    0.000 K/sec                  
+            49,201      page-faults               #    1.192 M/sec                    ( +-  0.00% )
+       133,717,861      cycles                    #    3.239 GHz                      ( +-  0.88% )  (44.22%)
+        86,337,819      instructions              #    0.65  insn per cycle           ( +-  1.61% )  (63.60%)
+        17,418,854      branches                  #  421.959 M/sec                    ( +-  1.32% )  (69.98%)
+            66,559      branch-misses             #    0.38% of all branches          ( +-  0.97% )  (70.94%)
+        30,976,393      L1-dcache-loads           #  750.381 M/sec                    ( +-  0.58% )  (46.10%)
+         1,449,312      L1-dcache-load-misses     #    4.68% of all L1-dcache hits    ( +-  1.25% )  (19.37%)
+            44,650      LLC-loads                 #    1.082 M/sec                    ( +-  1.70% )  (19.37%)
+            17,809      LLC-load-misses           #   39.89% of all LL-cache hits     ( +- 10.48% )  (29.06%)
+
+          0.041499 +- 0.000581 seconds time elapsed  ( +-  1.40% )
+
 ```
 
+上面是有 AVX 的版本，下面是沒有 AVX 的版本。沒有 AVX 的版本，Instruction Per Cycle 是 1.18，而有使用 AVX 的只有 0.65。如果只看這個指標，可能還會以為不用 AVX 的速度比較快。但如果看看 `cycles` 的話，會發現沒使用 AVX 的話，需要 621,283,329 個 cycle，但使用 AVX 的結果卻只有 133,717,861 個，幾乎只有前者的五分之一！而最下方的執行時間，也呈現類似的趨勢：沒有使用 AVX 的時間是 0.171542 秒，而有使用 AVX 則呈現類似趨勢，為 0.041499 秒，大約只有前者的 1/4 。這件事情可以觀察到：==IPC 並不保證程式效能比較高，還有很多因素會影響程式效能。==
 
+那麼，速度可能差在哪呢？可以發現沒有使用 AVX 時，光看 `L1-dcache-loads` ，沒優化的版本比有優化的版本多了 7.6 倍，而 `L1-dcache-load-misses`更多了 3 倍; 另外，`page-faults` 數目也大約是 5 倍。因此，可以推論沒有使用 AVX 時， Load/Store 的負擔較大，使得 panalty 變的更大。
 
+另外， branch 的數目也是將近 7.5 倍，就算優化的版本中， Branch Misses 的積機率稍高，因為基數大大減少的關係，使得 branch miss 的數目反而不如未優化前多。或可推論為「因為需要執行的迴圈次數變得更多，使得 branch 的基數變大，也對效能帶來了衝擊」。
 
+而最後一個因素是 `context-switches`，如果執行時間太久，容易被作業系統換下來，反而雪上加霜。
 
-## Thread Level Parallelism
+# Thread Level Parallelism
 
 
 
