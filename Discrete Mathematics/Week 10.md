@@ -1,5 +1,3 @@
-# Week 10
-
 # Generating Function
 
 數列 $\{a_n\}$ 的生成函數定義為以下的表示式：
