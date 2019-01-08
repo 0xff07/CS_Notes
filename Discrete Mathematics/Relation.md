@@ -19,7 +19,7 @@ M_{ij} = \begin{cases}
 0 & \text{if }(a_i, b_j) \not\in R
 \end{cases}
 $$
-另外一種是用圖。不過都寫出矩陣了，圖應該不難想像。
+另外一種是用圖。如果 $A \neq B$ 的話就會生出一張二分圖，如果 $A = B$ 的話，這個圖其實也就是 Adjacent Matrix。
 
 `2`
 
@@ -95,7 +95,7 @@ $$
 
 ---
 
-Remark：就是除了對角線之外，對稱的元素都要是 0 - 1 或 1 - 0。比如：
+Remark：「只有對角線會同時出現 $(a, b), (b, a) \in R$」
 $$
 R_{div} = \left\{(a,b) \mid \frac {b}{a} \in \mathbb Z\right\}
 $$
@@ -132,7 +132,7 @@ $R \in A \times A$，假定 $S$ 滿足：
 
 1. $S$ 滿足性質 A
 2. $R \subseteq S$
-3. $S$ 是滿足 1. 2. 的最小 relation，即：若有 $S'$ 滿足 1. 2.，則 $S' \subseteq S$
+3. $S$ 是滿足 1. 2. 的最小 relation，即：若有 $S'$ 滿足 1. 2.，則 $S \subseteq S'$
 
 則稱 $S$ 是一個 A - Closure。
 
@@ -151,6 +151,8 @@ $$
 
 ---
 
+白話文就是「把對角線的元素都設成 1」。
+
 ## Thm (Symmetric Closure)
 
 給定 $R \subseteq A \times A$，則 $R$ 的 symmentric closure 是：
@@ -161,9 +163,9 @@ $$
 $$
 R^{-1} = \{(a, b) \mid (b, a) \in R\}
 $$
-Q : 要怎麼證明這是 minimal ?
-
 ---
+
+其實也就是把「對稱的 1 都補上去」。
 
 ## Thm (Transitive Closure)
 
@@ -173,6 +175,8 @@ S = \{(a, b) \mid (a\in R) \and (b \in R) \and  (\exists p. a \overset{p}{\leads
 $$
 
 ---
+
+白話文就是「若 $a, b$ 連通，則 $(a, b) \in S$。」
 
 `TRANSITIVITY`
 
@@ -296,7 +300,7 @@ $$
 
 # Partial Ordering
 
-## Def (Equivalence Relation)
+## Def (Partial Odering)
 
 假定 $R \subseteq A \times A$ 均滿足 1) reflexive 2) transitive 3)==anti==symmentric，則稱 $R$ 是一個 ==partial ordering==。其中
 
@@ -351,6 +355,10 @@ $$
 ---
 
 ## Def (Hasse Diagram)
+
+1. 去掉 Reflective Edge：自己指到自己
+2. 去掉 Transitive Edge：只留「相鄰」的邊
+3. 去掉箭頭
 
 > Hard to draw with computer. Reference the textbook please.
 

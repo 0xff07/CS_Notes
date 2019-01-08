@@ -37,4 +37,4 @@ $$
 
 假定 $\lambda(G) = n - 1$，$G$ 是完全圖，因此顯然成立
 
-![IMG_4127](Connectivity.assets/IMG_4127.JPG)
+![IMG_4127](.Connectivity.assets/IMG_4127.JPG)

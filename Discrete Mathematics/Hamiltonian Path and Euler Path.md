@@ -288,7 +288,7 @@ Subdivision of a non-planar graph is also not a planar graph
 ### Thm (Kuratowski)
 
 $$
-G\text{ 是平面圖 } \iff \exists G' \subseteq G.G'\text{ is isomorphic to subdivision of }K_{3,3}\text{ or }K_5
+G\text{ 不是平面圖 } \iff \exists G' \subseteq G.G'\text{ is isomorphic to subdivision of }K_{3,3}\text{ or }K_5
 $$
 
 ------
