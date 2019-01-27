@@ -34,40 +34,27 @@
 
 1. 若 $G = (V, E)$ 是個有向圖，$u \in V$, 則：
 
+   1.  In-degree of $u$：進入 $u$ 的邊數。
+      $$
+      d_{u, i} = |\{(i, u)| (i, u) \in E\}|
+      $$
 
-     1. In-degree of $u$：進入 $u$ 的邊數。
+   2. Out-degree of $u$：從 $u$ 出發的邊數。
+      $$
+      d_{u, o} = |\{(u, i)| (u, i) \in E\}|
+      $$
 
-
-     $$
-       d_{u, i} = |\{(i, u)| (i, u) \in E\}|
-     $$
-
-
-     2. Out-degree of $u$：從 $u$ 出發的邊數。
-
-
-     $$
-            	d_{u, o} = |\{(u, i)| (u, i) \in E\}|
-     $$
-
-
-     3. Degree of u：$u$ 的 in-degree 加 out-degree。
-    
-     	$$
-     	\deg(u) = d_{u, i} + d_{u, o}
-     	$$
-
-
-
-
+   3. Degree of u：$u$ 的 in-degree 加 out-degree。
+      $$
+      \deg(u) = d_{u, i} + d_{u, o}
+      $$
 
 2. 若 $G = (V, E)$ 是個無向圖，且 $u\in V$，則： 
-    1. Degree of $u​$：
 
-
-    $$
-      \deg(u) = |\{(u, i) | (u, i) \in E\}|
-    $$
+    1. Degree of $u$
+       $$
+       \deg(u) = |\{(u, i) | (u, i) \in E\}|
+       $$
 
 ---
 

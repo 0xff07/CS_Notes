@@ -168,7 +168,7 @@ $$
 
 ---
 
-照定義來看，「剩餘網絡」並不是一個網路流。因為依照前面對網路流的定義，一個網路流必須滿足 $(u, v )\in E \Rightarrow(v, u) \not \in E$。但 $G_f$ 在 $0 < f(u, v) < c(u, v) $ 時，$c_f(u, v)$ 跟 $c_f(v, u)$ 都不為 0，因此 $(u, v) \in E_f$ 且 $(v, u) \in E_f$。
+照定義來看，「剩餘網絡」並不是一個網路流。因為依照前面對網路流的定義，一個網路流必須滿足 $(u, v )\in E \Rightarrow(v, u) \not \in E$。但 $G_f$ 在 $0 < f(u, v) < c(u, v) $ 時，$c_f(u, v)$ 跟 $c_f(v, u)$ 都不為 0，換句話說這個圖 $(u, v) \in E_f$ 且 $(v, u) \in E_f$。
 
 ---
 
@@ -194,7 +194,7 @@ $$
 
 ## Def (Augmentation)
 
-假定 $G$ 是一個網路流，容量函數為 $c$，$f$ 是一個 $G$ 上的流。假定 $G_f$ 是殘留網路，$f'$ 是一個 $G_f$ 上的流，則 augmentation of flow $f$ by $f'$ ，$f \uparrow f'$，是一個函數：
+假定 $G$ 是一個網路流，容量函數為 $c$，$f$ 是一個 $G$ 上的流。假定 $G_f$ 是殘留網路，$f'$ 是一個 $G_f$ 上的流，則 augmentation of flow $f$ by $f'$ ，或寫成 $f \uparrow f'$，是一個函數：
 $$
 (f \uparrow f') : V \times V \to \mathbb R
 $$
@@ -218,7 +218,7 @@ $$
 
 要證什麼東西是個流，就是要證明它滿足流的兩個限制。
 
-(Capacity Constrain)：目標是 $\forall (u, v) \in E.0 \leq (f\uparrow f')(u, v) \leq c(u, v)$
+==(Capacity Constrain)==：目標是 $\forall (u, v) \in E.0 \leq (f\uparrow f')(u, v) \leq c(u, v)$
 
 $ (f\uparrow f')(u, v) \leq c(u, v)$：對於任一邊 $(u, v) \in E$：
 $$
@@ -243,7 +243,7 @@ f'(v, u) \leq f(u, v) & \Rightarrow\  0\leq f(u, v) - f'(v, u) &\text{(3)} \newl
 $$
 因滿足容量限制。
 
-(Flow Conservation)：證明方向大概是 $f, f'$ 守恆 $\Rightarrow$ $(f\uparrow f')$ 守恆。
+==(Flow Conservation)==：證明方向大概是 $f, f'$ 守恆 $\Rightarrow$ $(f\uparrow f')$ 守恆。
 
 對於任意 $v \in V$。由定義知 $f$ 與 $f'$ 都滿足 Flow Conservation。因此對於任意 $u \in V \setminus\{s, t\}$：
 $$
