@@ -70,16 +70,16 @@ $$
 
 因為無向圖的 adjacency matrix 對稱，由此得證。
 
-用邊來計數 Degree 的數目即得。
+或是可以用邊來計數 Degree 的數目：一個邊貢獻 2 個 Degree，全部統計起來就得到了。
 
-歸納法：
+或是用歸納法：
 
 1. 圖為空，顯然成立
 2. 假定一張圖 $G = (V, E)$  滿足 hand-shaking lemma，則任意增加一個邊， deg 增加 2，因此仍然為偶數。
 
 ## Corollary
 
-degree 為奇數的節點一定有偶數個
+degree 為奇數的節點一定有偶數個（不然度數加起來就會是奇數）
 
 ---
 
@@ -176,12 +176,14 @@ $$
 
 $G = (V, E)$ 是個無向圖。則：
 $$
-u \overset{p}{\leadsto} v\Rightarrow u\overset{p'}{\leadsto}v,p'\text{is simple}
+\exists u \overset{p}{\leadsto} v\Rightarrow \exists u\overset{p'}{\leadsto}v,p'\text{is simple}
 $$
 
 ---
 
-$|V| = 2$: 只有兩個點。顯然成立。
+白話文是：如果這個路徑不 Simple （表示有環），把所有環拿掉就得到 Simple Path 了。
+
+$|V| = 2​$: 只有兩個點。顯然成立。
 
 假定 $|V| = |V'| - 1$ 時命題成立，則對於任意 $u, v \in V$：
 
@@ -204,13 +206,13 @@ $$
 
 # Thm：Undirected, Connected ⇒ |E|  ≥ |V| - 1
 
+這邊關鍵的觀察是：如果是頂點有 $|V|$ 個的無向圖，那最長的 Simple Path 就是經過所有的點剛好一次，所以長度最多是 $|V| - 1$。龜毛的證明方法是歸納法：
+
 1. |V| = 1 原題顯然成立。
 
 2. 假定 $|V| = |V'| + 1$，隨便挑出一個點 $v \in V$，並令剩下的子圖 $G' = (V', E')$ 。$V = V' \cup \{v\}$, $v \not \in V'$, $E' \subset E$：
 
      已知：$|E'| \geq |V'| - 1$，且 $|V| = |V'| + 1$。若原圖 $G = (V, E) = ( V' \cup \{v\}, E)$ 連通，則 $\exists u \in V'.(u, v) =: e \in E$，否則 $v$ 不連通。而 $v \not \in V'$，故 $e \not \in E'$，因此：
-
-
 
 $$
 |E| \geq |E'| + 1 \geq|V'| + 1=|V|

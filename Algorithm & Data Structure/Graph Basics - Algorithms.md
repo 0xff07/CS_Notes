@@ -176,29 +176,15 @@ int main()
 
 ---
 
-觀察：要證上面的命題，只要證完下面這兩個：
+觀察：要證上面的命題，只要證完任兩點 $v_i, v_j$，有：
 $$
-v_i.d < v_j.d 
-\begin{cases}
-v_i.f > v_j.d \Rightarrow v_i.f  > v_j.f & (\mathrm{claim\ 1}) \newline
-v_i.f <v_j.d  & (顯然兩區間沒交集)
-\end{cases}
+當\ 「v_i.d < v_j.d」\ 時，若\ 「v_i.f > v_j.d」 \ 則\  「v_i.f  > v_j.f」
 $$
 
-$$
-v_j.d < v_i.d 
-\begin{cases}
-v_j.f > v_i.d \Rightarrow v_j.f  > v_i.f & (\mathrm{claim\ 2}) \newline
-v_j.f <v_i.d  & (顯然兩區間沒交集)
-\end{cases}
-$$
+就可以證明了。
 
-就可以證明。而第二個狀況顯然只是把第一個狀況 $i,j$ 對調。所以只要證 claim 1，claim 2 就自動對。
-
-1.  $v_i.d < v_j.d$，但 $v_i.f > v_j.d$，表示「$v_j$ 是 $v_i$ 為 `GRAY` 時發現的」，即 $\mathtt{DFS(G, v_j)}$ 是在 $\mathtt{DFS(G, v_j)}$ 內部被呼叫，因此 $v_j$ 是 $v_i$ 的子節點。
-2. 而 $v_i.f$ 必定在 $\mathtt{DFS\_VISIT(G, v_j)}$ 回傳後才會更新，所以 $v_i.f < v_j.f$。因此得證 claim 1。
-
-另外，在兩區間沒有交集時，表示任一點都不是另一點為 `GRAY` 時發現的，因此不可能互為父子節點。
+1.  $v_i.d < v_j.d$，但 $v_i.f > v_j.d$，表示「$v_j$ 是 $v_i$ 為 `GRAY` 時發現的」，即 $\mathtt{DFS(G, v_j)}$ 是在 $\mathtt{DFS(G, v_i)}$ 內部被呼叫，因此 $v_j$ 是 $v_i$ 的子節點。
+2. 而 $v_i.f$ 必定在 $\mathtt{DFS\_VISIT(G, v_j)}$ 回傳後才會更新，所以 $v_i.f < v_j.f$。因此得證。
 
 #### Corollary (Nesting of descendants' intervals)
 
@@ -226,7 +212,7 @@ $$
 
 假定 $u = v$，命題顯然成立
 
-假定 $u \neq v$，則由 Nesting of descendants' intervals 知：對於任意子節點 $v'$，均有 $u.d < v'.d$。所以：
+假定 $u \neq v$，則由 Nesting of descendants' intervals 知：對於任意 $u$ 的子節點 $v'$，均有 $u.d < v'.d$。所以：
 
 1. 在 `time==u.d` 時，任意子節點 `v'` 都是 `WHITE` 。
 2. 而 $v$ 是 $u$ 在進行 DFS 時的子節點，表示存在 DFS 構造出的，一條往 $v$ 的路徑，而且這些路徑上的任一點都是 $u$ 的子節點。
@@ -554,8 +540,6 @@ $$
   v_{f + 1}.d \leq v_2.d + 1
 $$
   因此性質 2. 成立。
-
-
 
   又因為： 
 $$

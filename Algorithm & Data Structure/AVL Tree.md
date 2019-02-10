@@ -187,7 +187,7 @@ struct Node *rightRotate(struct Node *y)
 } 
 ```
 
-
+一個看旋轉的方式是「父子邊逆向，並且把靠裡面的那個子樹移去另外一個內側」。
 
 # References
 
